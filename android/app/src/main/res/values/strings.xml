@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- App Name -->
+    <string name="app_name">Listys</string>
+
+    <!-- Facebook -->
+    <string name="facebook_app_id">2065551900896667</string>
+    <string name="facebook_client_token">ec41f2a55dfb12e80e5a927feadbb7bb</string>
+    <string name="fb_login_protocol_scheme">fb2065551900896667</string>
+
+    <!-- Google -->
+    <string name="default_web_client_id">184288028654-eimu7b64g2roh0v9r60giiicl0s36amj.apps.googleusercontent.com</string>
+
+</resources>

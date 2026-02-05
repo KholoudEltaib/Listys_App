@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "49511000299",
+    "project_id": "listys-c1635",
+    "storage_bucket": "listys-c1635.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:49511000299:android:e5e207b0abe8ac965836ae",
+        "android_client_info": {
+          "package_name": "com.example.listys_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0V2K7_2ceDuWo4sECNEtGlw43cKWcPlw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

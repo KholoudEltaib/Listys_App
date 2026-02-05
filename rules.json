@@ -1,0 +1,81 @@
+{
+    "theme": {
+      "font": "Instrument Sans",
+      "colors": {
+        "primary": "#212529",
+        "secondary": "#f5f6f7",
+        "background": "#ffffff"
+      },
+      "spacing": "use modern padding/margin with 12-24px gaps between elements",
+      "rounded": "apply medium to large rounded corners (8px - 20px)",
+      "shadows": "use soft card shadows for containers",
+      "icon_style": "use line-based minimal icons (feather/lucide)"
+    },
+    "components": {
+      "header": {
+        "layout": "Greeting line with user's name and small circular avatar on the right",
+        "style": "light background, bold user name, welcome text underneath",
+        "alignment": "left-aligned"
+      },
+      "search_bar": {
+        "placement": "top section below header",
+        "style": "rounded input with light background and subtle search icon on the right",
+        "features": ["placeholder text", "filter icon"]
+      },
+      "category_tabs": {
+        "type": "horizontal scrollable pills",
+        "style": "filled and outlined options (highlight selected)",
+        "content_example": ["Asia", "Europe", "South America"]
+      },
+      "card": {
+        "type": "tour_card",
+        "layout": "large image, bottom dark overlay with city name and rating",
+        "corner_radius": "large",
+        "features": ["heart icon for wishlist", "reviews count", "See more button"]
+      },
+      "details_page": {
+        "header": "big hero image with back and favorite icon overlay",
+        "content": [
+          "City name and flag",
+          "Brief description",
+          "List of upcoming tours with mini cards"
+        ],
+        "style": "clean, white background with subtle dividers"
+      },
+      "tour_schedule": {
+        "type": "accordion list",
+        "style": "each day expandable with text details and small image",
+        "features": ["bold title for time of day", "icons if needed"]
+      },
+      "buttons": {
+        "primary": {
+          "label": "Book a tour",
+          "style": "rounded, black background, white text",
+          "placement": "bottom sticky footer on detail pages"
+        }
+      }
+    },
+    "guidelines": {
+      "tone": "modern, soft, friendly",
+      "visual_density": "medium spacing, don't clutter",
+      "text": {
+        "headings": "large and bold",
+        "body": "normal, grey text",
+        "reviews": "include star rating and count"
+      },
+      "animation": "use light micro-animations for tab switching and button presses"
+    },
+    "donots": [
+      "Don't copy the same images or color gradients",
+      "Don't use overly sharp edges",
+      "Avoid overly dense or flat layouts",
+      "Do not use complex shadows or overly dark UIs"
+    ],
+    "target_app": {
+      "type": "travel booking app",
+      "user_goal": "Explore, view and book multi-day trips",
+      "platform": "mobile (iOS/Android)",
+      "audience": "young to mid-age travelers"
+    }
+  }
+  
