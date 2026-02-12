@@ -282,14 +282,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw const ServerException('Failed to get Facebook access token');
       }
       
-      print('🟢 Facebook access token: ${accessToken.tokenString.substring(0, 20)}...');
+      print('🟢 Facebook access token: ${accessToken.token.substring(0, 20)}...');
       
       // Step 2: Send token to backend using the correct endpoint format
       print('🔵 Sending token to backend: POST /auth/social/facebook');
       final response = await dio.post(
         '/auth/social/facebook',
         data: {
-          'access_token': accessToken.tokenString,
+          'access_token': accessToken.token,
         },
       );
       
