@@ -45,6 +45,23 @@ post_install do |installer|
     
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+      
+      # Fix FacebookSDK XCFramework paths
+      if config.build_settings['FRAMEWORK_SEARCH_PATHS']
+        paths = config.build_settings['FRAMEWORK_SEARCH_PATHS']
+        if paths.is_a?(Array)
+          config.build_settings['FRAMEWORK_SEARCH_PATHS'] = paths.map { |p| p.gsub('//', '/') }
+        elsif paths.is_a?(String)
+          config.build_settings['FRAMEWORK_SEARCH_PATHS'] = paths.gsub('//', '/')
+        end
+      end
+    end
+  end
+  
+  # Fix double slash in FacebookSDK xcframework references
+  installer.pods_project.files.each do |file|
+    if file.path&.include?('FacebookSDK') && file.path&.include?('//')
+      file.path = file.path.gsub('//', '/')
     end
   end
 end
