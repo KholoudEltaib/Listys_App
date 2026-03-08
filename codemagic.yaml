@@ -9,17 +9,14 @@ workflows:
     scripts:
       - name: Clean Flutter project
         script: |
-          echo "Cleaning Flutter project..."
           flutter clean
 
       - name: Get Flutter packages
         script: |
-          echo "Getting Flutter packages..."
           flutter pub get
 
-      - name: Clean CocoaPods (without touching cache)
+      - name: Clean CocoaPods
         script: |
-          echo "Cleaning CocoaPods..."
           cd ios
           pod deintegrate || true
           rm -rf Pods
@@ -29,22 +26,27 @@ workflows:
 
       - name: Install Pods
         script: |
-          echo "Installing pods..."
           cd ios
           pod install --repo-update
-          
-          echo "Verifying Facebook XCFrameworks:"
-          FB_CACHE=~/Library/Caches/CocoaPods/Pods/Release/FacebookSDK_Dynamic/XCFrameworks
-          if [ -d "$FB_CACHE" ]; then
-            echo "✅ Facebook XCFrameworks found:"
-            ls "$FB_CACHE"
-          else
-            echo "⚠️ Not in cache, checking Pods directory..."
-            find . -name "*.xcframework" | grep -i facebook || echo "❌ No Facebook XCFrameworks found anywhere!"
-          fi
           cd ..
+
+      - name: Fix Facebook SDK double-slash paths
+        script: |
+          echo "Fixing double-slash in xcconfig files..."
+          find ios/Pods -name "*.xcconfig" | xargs grep -l "FacebookSDK\|FBSDK" 2>/dev/null | while read f; do
+            echo "Fixing: $f"
+            sed -i '' 's|//Library/Caches|/Library/Caches|g' "$f"
+          done
+          
+          echo "Fixing double-slash in pbxproj..."
+          sed -i '' 's|//Library/Caches|/Library/Caches|g' ios/Runner.xcodeproj/project.pbxproj 2>/dev/null || true
+          
+          echo "Fixing in Pods project..."
+          find ios/Pods -name "*.pbxproj" | xargs sed -i '' 's|//Library/Caches|/Library/Caches|g' 2>/dev/null || true
+          
+          echo "Verifying fix:"
+          grep -r "FacebookSDK" ios/Pods --include="*.xcconfig" | grep "//" && echo "⚠️ Still has double slash!" || echo "✅ No double slash found"
 
       - name: Build iOS
         script: |
-          echo "Building Flutter iOS app (release)..."
           flutter build ios --release --no-codesign
