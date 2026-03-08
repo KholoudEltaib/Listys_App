@@ -51,6 +51,5 @@ workflows:
             | xcpretty --color
 
     artifacts:
-      - ~/DerivedData/Build/Products/Release-iphoneos/*.app
-      - "**/*.ipa"
-      - flutter_drive.log
+      - build/ios/ipa/Runner.ipa
+      - build/app/outputs/flutter-apk/app-release.apk
