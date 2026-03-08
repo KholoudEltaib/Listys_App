@@ -17,11 +17,15 @@ workflows:
         script: |
           flutter pub get
 
-      - name: Update CocoaPods repo
+      - name: Reset CocoaPods
         script: |
+          cd ios
+          rm -rf Pods
+          rm -f Podfile.lock
           pod repo update
+          cd ..
 
-      - name: Install CocoaPods
+      - name: Install Pods
         script: |
           cd ios
           pod install --repo-update
