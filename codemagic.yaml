@@ -1,0 +1,26 @@
+workflows:
+  flutter-ios-build:
+    name: Flutter iOS Build
+    max_build_duration: 60
+
+    environment:
+      flutter: stable
+
+    scripts:
+      - name: Get Flutter packages
+        script: |
+          flutter pub get
+
+      - name: Clean project
+        script: |
+          flutter clean
+
+      - name: Install pods
+        script: |
+          cd ios
+          pod install --repo-update
+          cd ..
+
+      - name: Build iOS
+        script: |
+          flutter build ios --release --no-codesign
