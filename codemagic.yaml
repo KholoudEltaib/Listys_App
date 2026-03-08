@@ -9,9 +9,13 @@ workflows:
         - social_login_config
 
     scripts:
-      - name: Clean project
+      - name: Clean Flutter project
         script: |
           flutter clean
+
+      - name: Upgrade Flutter packages
+        script: |
+          flutter pub upgrade
 
       - name: Get Flutter packages
         script: |
@@ -21,6 +25,8 @@ workflows:
         script: |
           cd ios
           rm -rf Pods
+          rm -rf ~/Library/Caches/CocoaPods
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*
           rm -f Podfile.lock
           pod repo update
           cd ..
