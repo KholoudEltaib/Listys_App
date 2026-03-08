@@ -5,7 +5,8 @@ workflows:
 
     environment:
       flutter: stable
-
+      groups:
+        - social_login_config
     scripts:
       - name: Get Flutter packages
         script: |
