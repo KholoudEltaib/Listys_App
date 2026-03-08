@@ -52,4 +52,4 @@ workflows:
 
     artifacts:
       - build/ios/ipa/Runner.ipa
-      - build/app/outputs/flutter-apk/app-release.apk
+      - build/ios/iphoneos/Runner.app
