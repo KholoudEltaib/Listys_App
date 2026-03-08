@@ -30,23 +30,24 @@ workflows:
           pod install --repo-update
           cd ..
 
-      - name: Fix Facebook SDK double-slash paths
+      - name: Fix and Build iOS
         script: |
-          echo "Fixing double-slash in xcconfig files..."
-          find ios/Pods -name "*.xcconfig" | xargs grep -l "FacebookSDK\|FBSDK" 2>/dev/null | while read f; do
-            echo "Fixing: $f"
-            sed -i '' 's|//Library/Caches|/Library/Caches|g' "$f"
-          done
+          # Flutter بتعمل pod install تاني وبتمسح الـ fix
+          # الحل: نعمل الـ fix جوه نفس الخطوة بعد flutter build مباشرة
           
-          echo "Fixing double-slash in pbxproj..."
-          sed -i '' 's|//Library/Caches|/Library/Caches|g' ios/Runner.xcodeproj/project.pbxproj 2>/dev/null || true
+          # Run flutter build (هيفشل بسبب double slash)
+          flutter build ios --release --no-codesign || true
           
-          echo "Fixing in Pods project..."
-          find ios/Pods -name "*.pbxproj" | xargs sed -i '' 's|//Library/Caches|/Library/Caches|g' 2>/dev/null || true
+          # Fix double slash في كل الملفات
+          echo "🔧 Fixing double-slash paths..."
+          find ios/Pods -name "*.xcconfig" -exec sed -i '' 's|//Library/Caches|/Library/Caches|g' {} \; 2>/dev/null || true
+          find ios/Pods -name "*.pbxproj" -exec sed -i '' 's|//Library/Caches|/Library/Caches|g' {} \; 2>/dev/null || true
+          find ios -name "*.xcconfig" -exec sed -i '' 's|//Library/Caches|/Library/Caches|g' {} \; 2>/dev/null || true
           
-          echo "Verifying fix:"
-          grep -r "FacebookSDK" ios/Pods --include="*.xcconfig" | grep "//" && echo "⚠️ Still has double slash!" || echo "✅ No double slash found"
-
-      - name: Build iOS
-        script: |
+          # Verify
+          echo "✅ Verifying fix..."
+          grep -r "//Library/Caches" ios/Pods --include="*.xcconfig" && echo "⚠️ Still has issues" || echo "✅ All paths fixed"
+          
+          # Build again after fix
+          echo "🚀 Building again after fix..."
           flutter build ios --release --no-codesign
