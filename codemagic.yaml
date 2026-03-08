@@ -10,11 +10,9 @@ workflows:
       - name: Clean Flutter project
         script: |
           flutter clean
-
       - name: Get Flutter packages
         script: |
           flutter pub get
-
       - name: Clean CocoaPods
         script: |
           cd ios
@@ -23,18 +21,14 @@ workflows:
           rm -f Podfile.lock
           rm -rf ~/Library/Developer/Xcode/DerivedData/*
           cd ..
-
       - name: Install Pods
         script: |
           cd ios
           pod install --repo-update
           cd ..
-
       - name: Generate Flutter iOS build files
         script: |
-          # عشان Flutter تولد الـ Generated files من غير ما تعمل xcode build
           flutter build ios --release --no-codesign --config-only 2>/dev/null || true
-
       - name: Fix double-slash paths
         script: |
           echo "🔧 Fixing double-slash paths..."
@@ -42,7 +36,6 @@ workflows:
           find ios/Pods -name "*.pbxproj" -exec sed -i '' 's|//Library/Caches|/Library/Caches|g' {} \;
           rm -rf ~/Library/Developer/Xcode/DerivedData/*
           echo "✅ Done fixing paths"
-
       - name: Build iOS with xcodebuild
         script: |
           echo "🚀 Building with xcodebuild..."
@@ -56,3 +49,8 @@ workflows:
             CODE_SIGNING_REQUIRED=NO \
             COMPILER_INDEX_STORE_ENABLE=NO \
             | xcpretty --color
+
+    artifacts:
+      - ~/DerivedData/Build/Products/Release-iphoneos/*.app
+      - "**/*.ipa"
+      - flutter_drive.log
