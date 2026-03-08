@@ -7,45 +7,38 @@ workflows:
       flutter: stable
       groups:
         - social_login_config
-      vars:
-        FLUTTER_BUILD_MODE: "release"
 
     scripts:
-      # 1️⃣ تنظيف مشروع Flutter
       - name: Clean Flutter project
         script: |
           flutter clean
 
-      # 2️⃣ ترقية packages
       - name: Upgrade Flutter packages
         script: |
           flutter pub upgrade
 
-      # 3️⃣ تحميل packages
       - name: Get Flutter packages
         script: |
           flutter pub get
 
-      # 4️⃣ تنظيف CocoaPods بالكامل
       - name: Reset CocoaPods & remove DerivedData
         script: |
           cd ios
+          pod deintegrate
           rm -rf Pods
           rm -rf ~/Library/Caches/CocoaPods
-          rm -rf ~/Library/Developer/Xcode/DerivedData/*
           rm -f Podfile.lock
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*
           cd ..
 
-      # 5️⃣ تثبيت Pods مع تحديث الريبو
       - name: Install Pods (force update)
         script: |
           cd ios
           pod install --repo-update
-          echo "Listing Facebook SDK XCFrameworks to verify"
+          echo "Verifying Facebook XCFrameworks:"
           ls Pods/Release/FacebookSDK_Dynamic/XCFrameworks || echo "XCFrameworks not found!"
           cd ..
 
-      # 6️⃣ Build iOS بدون codesign
       - name: Build iOS
         script: |
           flutter build ios --release --no-codesign
