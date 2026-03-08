@@ -21,7 +21,7 @@ workflows:
         script: |
           flutter pub get
 
-      - name: Reset CocoaPods & remove DerivedData
+      - name: Force Clean CocoaPods & DerivedData
         script: |
           cd ios
           pod deintegrate
