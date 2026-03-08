@@ -30,24 +30,29 @@ workflows:
           pod install --repo-update
           cd ..
 
-      - name: Fix and Build iOS
+      - name: Generate Flutter iOS build files
         script: |
-          # Flutter بتعمل pod install تاني وبتمسح الـ fix
-          # الحل: نعمل الـ fix جوه نفس الخطوة بعد flutter build مباشرة
-          
-          # Run flutter build (هيفشل بسبب double slash)
-          flutter build ios --release --no-codesign || true
-          
-          # Fix double slash في كل الملفات
+          # عشان Flutter تولد الـ Generated files من غير ما تعمل xcode build
+          flutter build ios --release --no-codesign --config-only 2>/dev/null || true
+
+      - name: Fix double-slash paths
+        script: |
           echo "🔧 Fixing double-slash paths..."
-          find ios/Pods -name "*.xcconfig" -exec sed -i '' 's|//Library/Caches|/Library/Caches|g' {} \; 2>/dev/null || true
-          find ios/Pods -name "*.pbxproj" -exec sed -i '' 's|//Library/Caches|/Library/Caches|g' {} \; 2>/dev/null || true
-          find ios -name "*.xcconfig" -exec sed -i '' 's|//Library/Caches|/Library/Caches|g' {} \; 2>/dev/null || true
-          
-          # Verify
-          echo "✅ Verifying fix..."
-          grep -r "//Library/Caches" ios/Pods --include="*.xcconfig" && echo "⚠️ Still has issues" || echo "✅ All paths fixed"
-          
-          # Build again after fix
-          echo "🚀 Building again after fix..."
-          flutter build ios --release --no-codesign
+          find ios -name "*.xcconfig" -exec sed -i '' 's|//Library/Caches|/Library/Caches|g' {} \;
+          find ios/Pods -name "*.pbxproj" -exec sed -i '' 's|//Library/Caches|/Library/Caches|g' {} \;
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*
+          echo "✅ Done fixing paths"
+
+      - name: Build iOS with xcodebuild
+        script: |
+          echo "🚀 Building with xcodebuild..."
+          xcodebuild \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath ~/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            | xcpretty --color
