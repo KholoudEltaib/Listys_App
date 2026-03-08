@@ -2,50 +2,45 @@ workflows:
   flutter-ios-build:
     name: Flutter iOS Build
     max_build_duration: 60
-
     environment:
       flutter: stable
       groups:
         - social_login_config
-
     scripts:
       - name: Clean Flutter project
         script: |
           echo "Cleaning Flutter project..."
           flutter clean
 
-      - name: Upgrade Flutter packages
-        script: |
-          echo "Upgrading Flutter packages..."
-          flutter pub upgrade
-
       - name: Get Flutter packages
         script: |
           echo "Getting Flutter packages..."
           flutter pub get
 
-      - name: Force Clean CocoaPods & DerivedData
+      - name: Clean CocoaPods (without touching cache)
         script: |
-          echo "Cleaning CocoaPods and DerivedData..."
+          echo "Cleaning CocoaPods..."
           cd ios
-          pod deintegrate
+          pod deintegrate || true
           rm -rf Pods
-          rm -rf ~/Library/Caches/CocoaPods
           rm -f Podfile.lock
           rm -rf ~/Library/Developer/Xcode/DerivedData/*
           cd ..
 
-      - name: Install Pods (force update)
+      - name: Install Pods
         script: |
-          echo "Installing pods with repo update..."
+          echo "Installing pods..."
           cd ios
           pod install --repo-update
+          
           echo "Verifying Facebook XCFrameworks:"
-          if [ -d "Pods/Release/FacebookSDK_Dynamic/XCFrameworks" ]; then
-            echo "Facebook XCFrameworks are present"
-            ls Pods/Release/FacebookSDK_Dynamic/XCFrameworks
+          FB_CACHE=~/Library/Caches/CocoaPods/Pods/Release/FacebookSDK_Dynamic/XCFrameworks
+          if [ -d "$FB_CACHE" ]; then
+            echo "✅ Facebook XCFrameworks found:"
+            ls "$FB_CACHE"
           else
-            echo "⚠️ Facebook XCFrameworks not found!"
+            echo "⚠️ Not in cache, checking Pods directory..."
+            find . -name "*.xcframework" | grep -i facebook || echo "❌ No Facebook XCFrameworks found anywhere!"
           fi
           cd ..
 
