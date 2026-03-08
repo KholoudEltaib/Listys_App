@@ -11,18 +11,22 @@ workflows:
     scripts:
       - name: Clean Flutter project
         script: |
+          echo "Cleaning Flutter project..."
           flutter clean
 
       - name: Upgrade Flutter packages
         script: |
+          echo "Upgrading Flutter packages..."
           flutter pub upgrade
 
       - name: Get Flutter packages
         script: |
+          echo "Getting Flutter packages..."
           flutter pub get
 
       - name: Force Clean CocoaPods & DerivedData
         script: |
+          echo "Cleaning CocoaPods and DerivedData..."
           cd ios
           pod deintegrate
           rm -rf Pods
@@ -33,12 +37,19 @@ workflows:
 
       - name: Install Pods (force update)
         script: |
+          echo "Installing pods with repo update..."
           cd ios
           pod install --repo-update
           echo "Verifying Facebook XCFrameworks:"
-          ls Pods/Release/FacebookSDK_Dynamic/XCFrameworks || echo "XCFrameworks not found!"
+          if [ -d "Pods/Release/FacebookSDK_Dynamic/XCFrameworks" ]; then
+            echo "Facebook XCFrameworks are present"
+            ls Pods/Release/FacebookSDK_Dynamic/XCFrameworks
+          else
+            echo "⚠️ Facebook XCFrameworks not found!"
+          fi
           cd ..
 
       - name: Build iOS
         script: |
+          echo "Building Flutter iOS app (release)..."
           flutter build ios --release --no-codesign
