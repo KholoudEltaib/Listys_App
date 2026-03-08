@@ -7,16 +7,21 @@ workflows:
       flutter: stable
       groups:
         - social_login_config
-    scripts:
-      - name: Get Flutter packages
-        script: |
-          flutter pub get
 
+    scripts:
       - name: Clean project
         script: |
           flutter clean
 
-      - name: Install pods
+      - name: Get Flutter packages
+        script: |
+          flutter pub get
+
+      - name: Update CocoaPods repo
+        script: |
+          pod repo update
+
+      - name: Install CocoaPods
         script: |
           cd ios
           pod install --repo-update
