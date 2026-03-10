@@ -13,8 +13,6 @@ import 'package:listys_app/features/auth/data/repositories/auth_repository_impl.
 import 'package:listys_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:listys_app/features/auth/domain/usecases/login_with_email.dart';
 import 'package:listys_app/features/auth/domain/usecases/register.dart';
-import 'package:listys_app/features/auth/domain/usecases/login_with_instagram.dart';
-import 'package:listys_app/features/auth/domain/usecases/login_with_facebook.dart';
 import 'package:listys_app/features/auth/domain/usecases/login_with_google.dart';
 import 'package:listys_app/features/auth/domain/usecases/logout.dart';
 import 'package:listys_app/features/auth/domain/usecases/check_auth_status.dart';
@@ -154,12 +152,6 @@ Future<void> setupServiceLocator() async {
   getIt.registerLazySingleton<Register>(
     () => Register(getIt<AuthRepository>()),
   );
-  getIt.registerLazySingleton<LoginWithInstagram>(
-    () => LoginWithInstagram(getIt<AuthRepository>()),
-  );
-  getIt.registerLazySingleton<LoginWithFacebook>(
-    () => LoginWithFacebook(getIt<AuthRepository>()),
-  );
   getIt.registerLazySingleton<LoginWithGoogle>(
     () => LoginWithGoogle(getIt<AuthRepository>()),
   );
@@ -175,8 +167,6 @@ Future<void> setupServiceLocator() async {
     () => AuthBloc(
       loginWithEmail: getIt<LoginWithEmail>(),
       register: getIt<Register>(),
-      loginWithInstagram: getIt<LoginWithInstagram>(),
-      loginWithFacebook: getIt<LoginWithFacebook>(),
       loginWithGoogle: getIt<LoginWithGoogle>(),
       logout: getIt<Logout>(),
       checkAuthStatus: getIt<CheckAuthStatus>(),

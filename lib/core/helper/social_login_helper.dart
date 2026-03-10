@@ -41,9 +41,3 @@
 //   static Future<Map<String, dynamic>?> loginWithGoogle(BuildContext context) {
 //     return loginWithProvider(context, 'google');
 //   }
-
-//   /// Login with Facebook
-//   static Future<Map<String, dynamic>?> loginWithFacebook(BuildContext context) {
-//     return loginWithProvider(context, 'facebook');
-//   }
-// }

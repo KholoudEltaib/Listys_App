@@ -104,12 +104,6 @@ class AuthService {
     }
   }
 
-  Future<Map<String, dynamic>> loginWithFacebook() async {
-    throw Exception(
-      'Social login needs provider access token. Please integrate provider SDK first.',
-    );
-  }
-
   Future<Map<String, dynamic>> getUserProfile() async {
     final token = await getToken();
     if (token == null) throw Exception('No auth token');

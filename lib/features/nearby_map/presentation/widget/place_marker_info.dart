@@ -22,8 +22,8 @@ class PlaceMarkerInfo extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF2C3137).withOpacity(0.95), // start color
-            Color(0xFF17191D).withOpacity(0.95), // end color
+            const Color(0xFF2C3137).withOpacity(0.95), // start color
+            const Color(0xFF17191D).withOpacity(0.95), // end color
           ],
         ),
         borderRadius: BorderRadius.circular(16),

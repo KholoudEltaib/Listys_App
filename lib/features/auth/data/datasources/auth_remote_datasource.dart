@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/constants/api_endpoints.dart';
 import '../models/auth_result_model.dart';
@@ -9,8 +8,6 @@ import '../models/user_model.dart';
 abstract class AuthRemoteDataSource {
   Future<AuthResultModel> loginWithEmail(String email, String password);
   Future<AuthResultModel> register(String name, String email, String password);
-  Future<AuthResultModel> loginWithInstagram();
-  Future<AuthResultModel> loginWithFacebook();
   Future<AuthResultModel> loginWithGoogle();
   Future<UserModel> getUserProfile(String token);
   Future<UserModel> updateUserProfile(String token, {required String name, required String email});
@@ -173,181 +170,93 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<AuthResultModel> loginWithGoogle() async {
-    try {
-      print('🔵 Google Login: Starting SDK authentication...');
-      
-      // Initialize Google Sign-In if needed
-      await GoogleSignIn.instance.initialize(
-        clientId: '184288028654-eimu7b64g2roh0v9r60giiicl0s36amj.apps.googleusercontent.com', // Add your client ID here
-      );
-      
-      // Step 1: Sign in with Google SDK
-      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance.authenticate();
-      
-      if (googleUser == null) {
-        print('❌ Google sign in cancelled');
-        throw const ServerException('Google sign in cancelled');
-      }
-      
-      print('🟢 Google user signed in: ${googleUser.email}');
-      
-      // Step 2: Get authentication details
-      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
-      final String? idToken = googleAuth.idToken;
-      
-      if (idToken == null) {
-        print('❌ Failed to get Google ID token');
-        throw const ServerException('Failed to get Google ID token');
-      }
-      
-      print('🟢 Google ID token: ${idToken.substring(0, 20)}...');
-      
-      // Step 3: Send token to backend using the correct endpoint format
-      print('🔵 Sending token to backend: POST /auth/social/google');
-      final response = await dio.post(
-        '/auth/social/google',
-        data: {
-          'access_token': idToken,
-        },
-      );
-      
-      print('🟢 Backend response: ${response.statusCode}');
-      
-      if (response.statusCode != 200) {
-        final message = _extractMessage(response.data) ?? 'Google login failed';
-        throw ServerException(message, statusCode: response.statusCode);
-      }
-      
-      final data = response.data is Map<String, dynamic>
-          ? response.data as Map<String, dynamic>
-          : throw const ServerException('Invalid response format');
-      
-      final responseData = data['data'] as Map<String, dynamic>?;
-      if (responseData == null) {
-        throw const ServerException('Invalid response: missing data');
-      }
-      
-      final token = responseData['access_token'] as String?;
-      if (token == null || token.isEmpty) {
-        throw const ServerException('Invalid response: missing access token');
-      }
-      
-      print('🟢 JWT token received: ${token.substring(0, 20)}...');
-      
-      // Check if user is in response
-      final userJson = responseData['user'] as Map<String, dynamic>?;
-      if (userJson != null) {
-        final userModel = UserModel.fromJson(userJson);
-        return AuthResultModel(token: token, user: userModel);
-      }
-      
-      // If no user in response, fetch it
-      final userModel = await getUserProfile(token);
-      return AuthResultModel(token: token, user: userModel);
-      
-    } on DioException catch (e) {
-      print('❌ Dio error: ${e.message}');
-      if (e.error is ServerException) rethrow;
-      if (e.response != null) {
-        final message = _extractMessage(e.response?.data) ?? 'Google login failed';
-        throw ServerException(message, statusCode: e.response?.statusCode);
-      }
-      throw NetworkException('Network error: ${e.message}');
-    } catch (e) {
-      print('❌ Error: $e');
-      if (e is ServerException || e is NetworkException) rethrow;
-      throw ServerException('Google login error: $e');
-    }
-  }
-
-  @override
-  Future<AuthResultModel> loginWithFacebook() async {
-    try {
-      print('🔵 Facebook Login: Starting SDK authentication...');
-      
-      // Step 1: Sign in with Facebook SDK
-      final LoginResult result = await FacebookAuth.instance.login(
-        permissions: ['email', 'public_profile'],
-      );
-      
-      if (result.status != LoginStatus.success) {
-        print('❌ Facebook login failed: ${result.status}');
-        throw ServerException('Facebook login ${result.status}: ${result.message}');
-      }
-      
-      final AccessToken? accessToken = result.accessToken;
-      if (accessToken == null) {
-        print('❌ Failed to get Facebook access token');
-        throw const ServerException('Failed to get Facebook access token');
-      }
-      
-      print('🟢 Facebook access token: ${accessToken.token.substring(0, 20)}...');
-      
-      // Step 2: Send token to backend using the correct endpoint format
-      print('🔵 Sending token to backend: POST /auth/social/facebook');
-      final response = await dio.post(
-        '/auth/social/facebook',
-        data: {
-          'access_token': accessToken.token,
-        },
-      );
-      
-      print('🟢 Backend response: ${response.statusCode}');
-      
-      if (response.statusCode != 200) {
-        final message = _extractMessage(response.data) ?? 'Facebook login failed';
-        throw ServerException(message, statusCode: response.statusCode);
-      }
-      
-      final data = response.data is Map<String, dynamic>
-          ? response.data as Map<String, dynamic>
-          : throw const ServerException('Invalid response format');
-      
-      final responseData = data['data'] as Map<String, dynamic>?;
-      if (responseData == null) {
-        throw const ServerException('Invalid response: missing data');
-      }
-      
-      final token = responseData['access_token'] as String?;
-      if (token == null || token.isEmpty) {
-        throw const ServerException('Invalid response: missing access token');
-      }
-      
-      print('🟢 JWT token received: ${token.substring(0, 20)}...');
-      
-      // Check if user is in response
-      final userJson = responseData['user'] as Map<String, dynamic>?;
-      if (userJson != null) {
-        final userModel = UserModel.fromJson(userJson);
-        return AuthResultModel(token: token, user: userModel);
-      }
-      
-      // If no user in response, fetch it
-      final userModel = await getUserProfile(token);
-      return AuthResultModel(token: token, user: userModel);
-      
-    } on DioException catch (e) {
-      print('❌ Dio error: ${e.message}');
-      if (e.error is ServerException) rethrow;
-      if (e.response != null) {
-        final message = _extractMessage(e.response?.data) ?? 'Facebook login failed';
-        throw ServerException(message, statusCode: e.response?.statusCode);
-      }
-      throw NetworkException('Network error: ${e.message}');
-    } catch (e) {
-      print('❌ Error: $e');
-      if (e is ServerException || e is NetworkException) rethrow;
-      throw ServerException('Facebook login error: $e');
-    }
-  }
-
-  @override
-  Future<AuthResultModel> loginWithInstagram() async {
-    throw const ServerException(
-      'Instagram login not yet implemented. Please contact support.',
+Future<AuthResultModel> loginWithGoogle() async {
+  try {
+    print('🔵 Google Login: Starting SDK authentication...');
+    
+    // Create a GoogleSignIn instance
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      clientId: '184288028654-eimu7b64g2roh0v9r60giiicl0s36amj.apps.googleusercontent.com',
     );
+    
+    // Step 1: Sign in with Google SDK
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    
+    if (googleUser == null) {
+      print('❌ Google sign in cancelled');
+      throw const ServerException('Google sign in cancelled');
+    }
+    
+    print('🟢 Google user signed in: ${googleUser.email}');
+    
+    // Step 2: Get authentication details
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    final String? idToken = googleAuth.idToken;
+    
+    if (idToken == null) {
+      print('❌ Failed to get Google ID token');
+      throw const ServerException('Failed to get Google ID token');
+    }
+    
+    print('🟢 Google ID token: ${idToken.substring(0, 20)}...');
+    
+    // Step 3: Send token to backend
+    print('🔵 Sending token to backend: POST /auth/social/google');
+    final response = await dio.post(
+      '/auth/social/google',
+      data: {
+        'access_token': idToken,
+      },
+    );
+    
+    print('🟢 Backend response: ${response.statusCode}');
+    
+    if (response.statusCode != 200) {
+      final message = _extractMessage(response.data) ?? 'Google login failed';
+      throw ServerException(message, statusCode: response.statusCode);
+    }
+    
+    final data = response.data is Map<String, dynamic>
+        ? response.data as Map<String, dynamic>
+        : throw const ServerException('Invalid response format');
+    
+    final responseData = data['data'] as Map<String, dynamic>?;
+    if (responseData == null) {
+      throw const ServerException('Invalid response: missing data');
+    }
+    
+    final token = responseData['access_token'] as String?;
+    if (token == null || token.isEmpty) {
+      throw const ServerException('Invalid response: missing access token');
+    }
+    
+    print('🟢 JWT token received: ${token.substring(0, 20)}...');
+    
+    // Check if user is in response
+    final userJson = responseData['user'] as Map<String, dynamic>?;
+    if (userJson != null) {
+      final userModel = UserModel.fromJson(userJson);
+      return AuthResultModel(token: token, user: userModel);
+    }
+    
+    // If no user in response, fetch it
+    final userModel = await getUserProfile(token);
+    return AuthResultModel(token: token, user: userModel);
+    
+  } on DioException catch (e) {
+    print('❌ Dio error: ${e.message}');
+    if (e.error is ServerException) rethrow;
+    if (e.response != null) {
+      final message = _extractMessage(e.response?.data) ?? 'Google login failed';
+      throw ServerException(message, statusCode: e.response?.statusCode);
+    }
+    throw NetworkException('Network error: ${e.message}');
+  } catch (e) {
+    print('❌ Error: $e');
+    if (e is ServerException || e is NetworkException) rethrow;
+    throw ServerException('Google login error: $e');
   }
+}
 
   @override
   Future<UserModel> getUserProfile(String token) async {

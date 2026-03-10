@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: BlocBuilder<HomeCubit, HomeState>(
           builder: (context, state) {
             if (state is HomeLoading) {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
                 ),
@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 20),
                     
                     // Header
-                    Header(),
+                    const Header(),
                     const SizedBox(height: 20),
                     // Search bar + Map button
                     Row(

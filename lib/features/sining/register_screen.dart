@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:listys_app/core/routes/app_routes.dart';
-import 'package:listys_app/features/home/presentation/widgets/buttom_navbar.dart';
-import 'package:listys_app/features/sining/login_screen.dart';
 import 'package:listys_app/features/sining/otp_screen.dart';
 import '../auth/presentation/bloc/auth_bloc.dart';
 import '../auth/presentation/bloc/auth_event.dart';

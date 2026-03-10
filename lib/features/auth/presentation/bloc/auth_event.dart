@@ -27,12 +27,6 @@ class RegisterRequested extends AuthEvent {
   });
 }
 
-class LoginWithFacebookRequested extends AuthEvent {
-  final BuildContext context;
-
-  LoginWithFacebookRequested({ required this.context});
-}
-
 class LoginWithGoogleRequested extends AuthEvent {
   final BuildContext context;
 

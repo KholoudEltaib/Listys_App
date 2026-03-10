@@ -78,44 +78,6 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthResult>> loginWithFacebook(BuildContext context) async {
-    try {
-      // Don't pass context to remote data source - it's not needed
-      final authResult = await remoteDataSource.loginWithFacebook(); 
-      await localDataSource.saveToken(authResult.token);
-      await localDataSource.saveUserData(authResult.user as UserModel);
-      return Right(authResult);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message));
-    } on CacheException catch (e) {
-      return Left(CacheFailure(message: e.message));
-    } catch (e) {
-      return Left(ServerFailure(message: 'Unexpected error: $e'));
-    }
-  }
-
-  @override
-  Future<Either<Failure, AuthResult>> loginWithInstagram(BuildContext context) async {
-    try {
-      // Don't pass context to remote data source - it's not needed
-      final authResult = await remoteDataSource.loginWithInstagram(); 
-      await localDataSource.saveToken(authResult.token);
-      await localDataSource.saveUserData(authResult.user as UserModel);
-      return Right(authResult);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message));
-    } on CacheException catch (e) {
-      return Left(CacheFailure(message: e.message));
-    } catch (e) {
-      return Left(ServerFailure(message: 'Unexpected error: $e'));
-    }
-  }
-
-  @override
   Future<Either<Failure, User>> getUserProfile() async {
     try {
       final token = await localDataSource.getToken();

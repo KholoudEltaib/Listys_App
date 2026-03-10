@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:listys_app/core/helper/app_constants.dart';
 import 'package:listys_app/core/localization/app_localizations.dart';
 import 'package:listys_app/core/theme/app_color.dart';
 import 'package:listys_app/core/di/service_locator.dart';

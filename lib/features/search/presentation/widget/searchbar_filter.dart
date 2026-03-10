@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:listys_app/core/localization/app_localizations.dart';
-import 'package:listys_app/core/theme/app_color.dart';
 import 'package:listys_app/features/country_cities/presentation/view/country_cities_screen.dart';
 import 'package:listys_app/features/search/presentation/cubit/search_cubit.dart';
 import 'package:listys_app/features/search/presentation/cubit/search_state.dart';
-import 'package:listys_app/features/search/presentation/widget/filter_bottom_sheet.dart';
 
 class SearchbarFilter extends StatefulWidget {
   final TextEditingController controller;

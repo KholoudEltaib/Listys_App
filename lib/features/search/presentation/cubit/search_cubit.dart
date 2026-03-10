@@ -135,7 +135,7 @@ class SearchCubit extends Cubit<SearchState> {
         // You can also load popular categories here
         emit(SearchSuggestionsLoaded(
           countries: countries.take(8).toList(),
-          popularCategories: [], // Add logic to load categories
+          popularCategories: const [], // Add logic to load categories
         ));
       },
     );

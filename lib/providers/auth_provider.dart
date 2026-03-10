@@ -112,21 +112,4 @@ class AuthProvider with ChangeNotifier {
     }
     notifyListeners();
   }
-
-  Future<void> loginWithFacebook() async {
-    try {
-      final data = await _authService.loginWithFacebook();
-      if (data.containsKey('token')) {
-        _token = data['token'];
-        _status = AuthStatus.authenticated;
-      } else {
-        _status = AuthStatus.unauthenticated;
-      }
-    } catch (e) {
-      print('Facebook login failed: $e');
-      _status = AuthStatus.unauthenticated;
-      rethrow;
-    }
-    notifyListeners();
-  }
 }

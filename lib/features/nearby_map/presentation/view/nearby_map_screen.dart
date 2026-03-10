@@ -231,7 +231,7 @@ class _NearbyMapViewState extends State<NearbyMapView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  MapZoneSelector(),
+                  const MapZoneSelector(),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(

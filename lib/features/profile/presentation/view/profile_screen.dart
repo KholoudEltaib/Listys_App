@@ -127,7 +127,7 @@ class ProfileScreen extends StatelessWidget {
                                         child: Container(
                                           height: 32,
                                           width: 32,
-                                          decoration: BoxDecoration(
+                                          decoration: const BoxDecoration(
                                             color: AppColors.primaryColor,
                                             shape: BoxShape.circle,
                                           ),

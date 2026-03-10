@@ -2,8 +2,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/usecases/login_with_email.dart';
 import '../../domain/usecases/register.dart';
-import '../../domain/usecases/login_with_instagram.dart';
-import '../../domain/usecases/login_with_facebook.dart';
 import '../../domain/usecases/login_with_google.dart'; 
 import '../../domain/usecases/logout.dart';
 import '../../domain/usecases/check_auth_status.dart';
@@ -16,8 +14,6 @@ import 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginWithEmail _loginWithEmail;
   final Register _register;
-  final LoginWithInstagram _loginWithInstagram;
-  final LoginWithFacebook _loginWithFacebook;
   final LoginWithGoogle _loginWithGoogle; 
   final Logout _logout;
   final CheckAuthStatus _checkAuthStatus;
@@ -26,16 +22,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({
     required LoginWithEmail loginWithEmail,
     required Register register,
-    required LoginWithInstagram loginWithInstagram,
-    required LoginWithFacebook loginWithFacebook,
     required LoginWithGoogle loginWithGoogle, 
     required Logout logout,
     required CheckAuthStatus checkAuthStatus,
     required AuthRepository authRepository,
   })  : _loginWithEmail = loginWithEmail,
         _register = register,
-        _loginWithInstagram = loginWithInstagram,
-        _loginWithFacebook = loginWithFacebook,
         _loginWithGoogle = loginWithGoogle,
         _logout = logout,
         _checkAuthStatus = checkAuthStatus,
@@ -44,8 +36,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthCheckRequested>(_onAuthCheckRequested);
     on<LoginWithEmailRequested>(_onLoginWithEmailRequested);
     on<RegisterRequested>(_onRegisterRequested);
-    on<LoginWithInstagramRequested>(_onLoginWithInstagramRequested);
-    on<LoginWithFacebookRequested>(_onLoginWithFacebookRequested);
     on<LoginWithGoogleRequested>(_onLoginWithGoogleRequested);
     on<LogoutRequested>(_onLogoutRequested);
   }
@@ -159,62 +149,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       },
     );
   }
-
-  Future<void> _onLoginWithInstagramRequested(
-    LoginWithInstagramRequested event,
-    Emitter<AuthState> emit,
-  ) async {
-    emit(AuthLoading());
-    
-    final result = await _loginWithInstagram(event.context);
-    
-    await result.fold(
-      (failure) async => emit(AuthError(message: failure.message)),
-      (authResult) async {
-        final userModel = UserModel.fromEntity(authResult.user);
-        await StorageHelper.saveToken(authResult.token);
-        await StorageHelper.saveUserData(userModel);
-
-        emit(AuthAuthenticated(
-          user: userModel,
-          token: authResult.token,
-        ));
-      },
-    );
-  }
-
- Future<void> _onLoginWithFacebookRequested(
-  LoginWithFacebookRequested event,
-  Emitter<AuthState> emit,
-) async {
-  emit(AuthLoading());
-
-  final result = await _loginWithFacebook(event.context);
-    print('🔵 Facebook login result: $result');
-
-  await result.fold(
-    (failure) async {
-      print('🔴 Facebook login failed: ${failure.message}');
-      emit(AuthError(message: failure.message));
-    },
-    (authResult) async {
-      print('🟢 Facebook login success');
-      print('🟢 Token from backend: ${authResult.token}');
-      print('🟢 User: ${authResult.user.email}');
-
-      final userModel = UserModel.fromEntity(authResult.user);
-
-      await StorageHelper.saveToken(authResult.token);
-      await StorageHelper.saveUserData(userModel);
-
-      emit(AuthAuthenticated(
-        user: userModel,
-        token: authResult.token,
-      ));
-    },
-  );
-}
-
 
   Future<void> _onLoginWithGoogleRequested(
     LoginWithGoogleRequested event,

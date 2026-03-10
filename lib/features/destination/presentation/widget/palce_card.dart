@@ -124,7 +124,7 @@ class DestinationCard extends StatelessWidget {
                             place.rating != null)
                           Row(
                             children: [
-                              Icon(Icons.star,
+                              const Icon(Icons.star,
                                   size: 14, color: AppColors.primaryColor),
                               const SizedBox(width: 4),
                               Text(

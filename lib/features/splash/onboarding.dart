@@ -22,7 +22,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (_) => LoginScreen(),
+              builder: (_) => const LoginScreen(),
             ),
           );
   }

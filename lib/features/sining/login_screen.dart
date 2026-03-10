@@ -122,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) =>  ForgetPasswordScreen(),
+                                builder: (context) =>  const ForgetPasswordScreen(),
                               ),
                             );
                           },
@@ -215,12 +215,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                           ),                          
                           const SizedBox(width: 24),
-                          _SocialIconButton(
-                            icon: Icons.facebook,
-                            onTap: () {
-                            context.read<AuthBloc>().add(LoginWithFacebookRequested(context: context)); 
-                            },
-                          ),
                           
                         ],
                       ),

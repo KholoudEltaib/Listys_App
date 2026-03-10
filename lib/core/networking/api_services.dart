@@ -1,6 +1,5 @@
 // lib/core/networking/api_services.dart
 import 'package:dio/dio.dart';
-import 'package:listys_app/core/localization/locale_cubit/locale_cubit.dart';
 import 'api_constants.dart';
 import 'api_error_handler.dart';
 import 'dio_factory.dart';

@@ -35,7 +35,7 @@ class CustomImageNetwork extends StatelessWidget {
               child: SizedBox(
                   height: 24.h,
                   width: 24.h,
-                  child: CircularProgressIndicator(
+                  child: const CircularProgressIndicator(
                     strokeWidth: 2,
                     color: AppColors.grey,
                   ))),

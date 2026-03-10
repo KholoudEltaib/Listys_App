@@ -169,7 +169,7 @@ class _LanguageOptionsScreenState extends State<LanguageOptionsScreen> {
           ),
           const Spacer(),
           if (isSelected)
-            Icon(
+            const Icon(
               Icons.check_circle,
               color: AppColors.primaryColor,
               size: 20,
