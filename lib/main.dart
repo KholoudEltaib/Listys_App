@@ -15,6 +15,7 @@ import 'package:listys_app/core/localization/locale_cubit/locale_cubit.dart';
 import 'package:listys_app/features/favorite/presentation/cubit/favorite_cubit.dart';
 import 'package:listys_app/features/search/presentation/cubit/search_cubit.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
       child: BlocBuilder<LocaleCubit, LocaleState>(
         builder: (context, localeState) {
           return MaterialApp(
+            navigatorKey: navigatorKey,
             title: 'Listys',
             debugShowCheckedModeBanner: false,
             onGenerateRoute: AppRouting().onGenerateRouting,

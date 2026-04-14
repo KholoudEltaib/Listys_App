@@ -1,6 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:listys_app/core/constants/api_endpoints.dart';
+import 'package:listys_app/core/constants/app_constants.dart';
+import 'package:listys_app/core/network/auth_interceptor.dart';
+import 'package:listys_app/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:listys_app/core/network/dio_client.dart';
 import 'package:listys_app/core/network/network_info.dart';
@@ -94,24 +99,30 @@ Future<void> setupServiceLocator() async {
   // ========================================================================
   
   // Initialize async dependencies
-  await StorageHelper.init();
-  final sharedPrefs = await SharedPreferences.getInstance();
+await StorageHelper.init();
+final sharedPrefs = await SharedPreferences.getInstance();
 
-  // External dependencies
-  getIt.registerLazySingleton<SharedPreferences>(() => sharedPrefs);
-  getIt.registerLazySingleton<FlutterSecureStorage>(
-    () => const FlutterSecureStorage(),
-  );
-  
+getIt.registerLazySingleton<SharedPreferences>(() => sharedPrefs);
+getIt.registerLazySingleton<FlutterSecureStorage>(
+  () => const FlutterSecureStorage(),
+);
 
-  // Network - DioClient (which creates Dio internally)
-  getIt.registerLazySingleton<DioClient>(() => DioClient());
-  
-  // Dio instance from DioClient
-  getIt.registerLazySingleton<Dio>(() => getIt<DioClient>().dio);
+// ✅ Register navigatorKey HERE, before DioClient
+getIt.registerLazySingleton<GlobalKey<NavigatorState>>(() => navigatorKey);
 
-  getIt.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl());
+// Network
+getIt.registerLazySingleton<DioClient>(() => DioClient());
+getIt.registerLazySingleton<Dio>(() => getIt<DioClient>().dio);
 
+// ✅ Add AuthInterceptor to the already-registered Dio (no new registration)
+getIt<Dio>().interceptors.add(
+  AuthInterceptor(
+    secureStorage: getIt<FlutterSecureStorage>(),
+    navigatorKey: getIt<GlobalKey<NavigatorState>>(),
+  ),
+);
+
+getIt.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl());
 
   print('✅ Core dependencies registered');
 

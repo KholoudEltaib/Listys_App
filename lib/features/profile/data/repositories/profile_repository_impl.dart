@@ -17,7 +17,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
       final user = await remoteDataSource.getProfile();
       return Right(user);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(message: e.toString().replaceFirst('Exception: ', '')));
     }
   }
 
@@ -58,7 +58,7 @@ Future<Either<Failure, User>> updateProfile({
       );
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(message: e.toString().replaceFirst('Exception: ', '')));
     }
   }
 
@@ -68,7 +68,7 @@ Future<Either<Failure, User>> updateProfile({
       await remoteDataSource.changeLanguage(locale);
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(message: e.toString().replaceFirst('Exception: ', '')));
     }
   }
 
@@ -78,7 +78,7 @@ Future<Either<Failure, User>> updateProfile({
       await remoteDataSource.deleteAccount();
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(message: e.toString().replaceFirst('Exception: ', '')));
     }
   }
 }

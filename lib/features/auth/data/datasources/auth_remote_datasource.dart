@@ -175,10 +175,15 @@ Future<AuthResultModel> loginWithGoogle() async {
     print('🔵 Google Login: Starting SDK authentication...');
     
     // Create a GoogleSignIn instance
-    final GoogleSignIn googleSignIn = GoogleSignIn(
-      clientId: '184288028654-eimu7b64g2roh0v9r60giiicl0s36amj.apps.googleusercontent.com',
-    );
+    // final GoogleSignIn googleSignIn = GoogleSignIn(
+    //   clientId: '184288028654-eimu7b64g2roh0v9r60giiicl0s36amj.apps.googleusercontent.com',
+    // );
     
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      scopes: ['email', 'profile'],
+    );
+
+
     // Step 1: Sign in with Google SDK
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
     

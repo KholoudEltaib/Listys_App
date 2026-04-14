@@ -214,6 +214,7 @@ class AppLocalizations {
   String get within_km => translate("Within km");
   String get city_view => translate("City View");
   String get all_places => translate("All Places");
+  String get login_with_google => translate("login_with_google");
 }
 
 class _AppLocalizationsDelegate

@@ -138,7 +138,7 @@ class LanguageSwitch extends StatelessWidget {
                   localeCubit.setEnglish();
                 } 
               },
-              activeThumbColor: Colors.blue,
+              activeColor: Colors.blue,
             ),
             if (showLabel) ...[
               const SizedBox(width: 12),

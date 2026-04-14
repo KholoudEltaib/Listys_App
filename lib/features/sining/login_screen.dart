@@ -203,21 +203,40 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                       const SizedBox(height: 20),
-                      
-                      // Social Buttons
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _SocialIconButton(
-                            icon: Icons.g_mobiledata_rounded,
-                            onTap: () {
-                              context.read<AuthBloc>().add(LoginWithGoogleRequested(context: context)); 
-                            },
-                          ),                          
-                          const SizedBox(width: 24),
-                          
-                        ],
+                      ElevatedButton(
+                        onPressed: () {
+                          context.read<AuthBloc>().add(LoginWithGoogleRequested(context: context)); 
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF212529),
+                          foregroundColor: const Color(0xFFF9B933),
+                          shape: RoundedRectangleBorder(
+                            side: const BorderSide(color: Color(0xFFF9B933)),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          textStyle: const TextStyle(
+                            fontFamily: 'Instrument Sans',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        child: Text(loc.login_with_google),
                       ),
+                      // // Social Buttons
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.center,
+                      //   children: [
+                      //     _SocialIconButton(
+                      //       icon: Icons.g_mobiledata_rounded,
+                      //       onTap: () {
+                      //         context.read<AuthBloc>().add(LoginWithGoogleRequested(context: context)); 
+                      //       },
+                      //     ),                          
+                      //     const SizedBox(width: 24),
+                      //   ],
+                      // ),
                       const SizedBox(height: 32),
                       
                       // Don't have an account
