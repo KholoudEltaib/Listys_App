@@ -15,17 +15,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  Future<void> _completeOnboarding() async {
+Future<void> _completeOnboarding() async {
+  try {
+    // Attempt to save the state
     await StorageHelper.setOnboardingCompleted(true);
-    if (!mounted) return;
-    // Navigator.pushReplacementNamed(context, AppRoutes.loginScreen);
-    Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const LoginScreen(),
-            ),
-          );
+  } catch (e) {
+    // Log the error if it fails, but don't stop the navigation!
+    debugPrint('Failed to save onboarding state: $e');
   }
+
+  if (!mounted) return;
+  
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const LoginScreen(),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -54,18 +61,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 20, top: 10),
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: GestureDetector(
-                  onTap: _completeOnboarding,
-                  child: Text(
-                    loc.skip,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque, 
+              onTap: () {
+                _completeOnboarding();
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Text(
+                  loc.skip,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
                   ),
                 ),
               ),

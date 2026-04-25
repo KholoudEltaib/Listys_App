@@ -20,23 +20,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
-  // Future<void> _loginWithInstagram() async {
-  //   context.read<AuthBloc>().add(LoginWithInstagramRequested());
-  // }
-
-  Future<void> _loginWithEmail() async {
-    if (!_formKey.currentState!.validate()) return;
-    
-    context.read<AuthBloc>().add(LoginWithEmailRequested(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    ));
-  }
-
-  // Future<void> _loginWithGoogle() async {
-  //   context.read<AuthBloc>().add(LoginWithGoogleRequested(context: context));
-  // }
+  bool _hasAttemptedLogin = false;
 
   @override
   void dispose() {
@@ -45,84 +31,122 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  void _loginWithEmail() {
+    setState(() => _hasAttemptedLogin = true);
+
+    FocusScope.of(context).unfocus();
+
+    if (!_formKey.currentState!.validate()) return;
+
+    context.read<AuthBloc>().add(LoginWithEmailRequested(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        ));
+  }
+
+  void _showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  fontFamily: 'Instrument Sans',
+                  fontSize: 14,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFFD32F2F),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Logo
-              Image.asset(  
-                'assets/images/splash/listys_logo.png',
-                width: 190,
-                height: 80,
-              ),
-              const SizedBox(height: 40),
-              
-              // Welcome Back Title
-              Text(
-                loc.welcomeBack,
-                style: const TextStyle(
-                  fontFamily: 'Instrument Sans',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 28,
-                  color: Colors.white,
-                  letterSpacing: 1.5,
+      body: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthError) {
+            _showError(context, state.message);
+          } else if (state is AuthAuthenticated) {
+            // Only navigate on a genuine successful login —
+            // this is inside the listener so it only fires on state changes.
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              AppRoutes.mainScreen,
+              (route) => false,
+            );
+          }
+        },
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Logo
+                Image.asset(
+                  'assets/images/splash/listys_logo.png',
+                  width: 190,
+                  height: 80,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 40),
-              
-              BlocListener<AuthBloc, AuthState>(
-                listener: (context, state) {
-                  if (state is AuthError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(state.message),
-                        backgroundColor: Colors.red.shade100,
-                        duration: const Duration(seconds: 4),
-                      ),
-                    );
-                  } else if (state is AuthAuthenticated) {
-                    // Navigate to Main Screen after successful login
-                    Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    AppRoutes.mainScreen,
-                    (route) => false, 
-                  );
-                  }
-                },
-                child: Form(
+                const SizedBox(height: 40),
+
+                // Title
+                Text(
+                  loc.welcomeBack,
+                  style: const TextStyle(
+                    fontFamily: 'Instrument Sans',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                    color: Colors.white,
+                    letterSpacing: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 40),
+
+                Form(
                   key: _formKey,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Email Section
+                      // ── Email ───────────────────────────────────────────
                       _buildLabel(loc.email),
                       const SizedBox(height: 8),
                       _buildEmailField(loc),
                       const SizedBox(height: 24),
-                      
-                      // Password Section
+
+                      // ── Password ────────────────────────────────────────
                       _buildLabel(loc.password),
                       const SizedBox(height: 8),
                       _buildPasswordField(loc),
-                      const SizedBox(height: 16),
-                      
-                      // Forget Password
+                      const SizedBox(height: 8),
+
+                      // ── Forgot Password ─────────────────────────────────
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) =>  const ForgetPasswordScreen(),
+                                builder: (_) => const ForgetPasswordScreen(),
                               ),
                             );
                           },
@@ -138,113 +162,121 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      // Sign In Button
+
+                      // ── Sign In Button ──────────────────────────────────
                       BlocBuilder<AuthBloc, AuthState>(
                         builder: (context, state) {
+                          final isLoading = state is AuthLoading;
                           return SizedBox(
                             width: double.infinity,
                             height: 56,
-                            child: state is AuthLoading
-                                ? const Center(
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : ElevatedButton(
-                                    onPressed: _loginWithEmail,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFFF9B933),
-                                      foregroundColor: const Color(0xFF212529),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                            child: ElevatedButton(
+                              onPressed: isLoading ? null : _loginWithEmail,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFF9B933),
+                                foregroundColor: const Color(0xFF212529),
+                                disabledBackgroundColor:
+                                    const Color(0xFFF9B933).withOpacity(0.6),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                textStyle: const TextStyle(
+                                  fontFamily: 'Instrument Sans',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
+                                elevation: 0,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                              ),
+                              child: isLoading
+                                  ? const SizedBox(
+                                      width: 22,
+                                      height: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: Color(0xFF212529),
                                       ),
-                                      textStyle: const TextStyle(
-                                        fontFamily: 'Instrument Sans',
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
-                                      ),
-                                      elevation: 0,
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                    ),
-                                    child: Text(loc.login),
-                                  ),
+                                    )
+                                  : Text(loc.login),
+                            ),
                           );
                         },
                       ),
                       const SizedBox(height: 24),
-                      
-                      // Or sign with text
-                      
+
+                      // ── Divider ─────────────────────────────────────────
                       Row(
-                      children: [
-                        const Expanded(
-                          child: Divider(
-                            color: Colors.white30,
-                            thickness: 1,
+                        children: [
+                          const Expanded(
+                            child: Divider(color: Colors.white30, thickness: 1),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            loc.translate('orSignInWith'),
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
-                              fontFamily: 'Instrument Sans',
-                              fontSize: 14,
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              loc.translate('orSignInWith'),
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.7),
+                                fontFamily: 'Instrument Sans',
+                                fontSize: 14,
+                              ),
                             ),
                           ),
-                        ),
-                        const Expanded(
-                          child: Divider(
-                            color: Colors.white30,
-                            thickness: 1,
+                          const Expanded(
+                            child: Divider(color: Colors.white30, thickness: 1),
                           ),
-                        ),
-                      ],
-                    ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          context.read<AuthBloc>().add(LoginWithGoogleRequested(context: context)); 
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF212529),
-                          foregroundColor: const Color(0xFFF9B933),
-                          shape: RoundedRectangleBorder(
-                            side: const BorderSide(color: Color(0xFFF9B933)),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          textStyle: const TextStyle(
-                            fontFamily: 'Instrument Sans',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        child: Text(loc.login_with_google),
+                        ],
                       ),
-                      // // Social Buttons
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.center,
-                      //   children: [
-                      //     _SocialIconButton(
-                      //       icon: Icons.g_mobiledata_rounded,
-                      //       onTap: () {
-                      //         context.read<AuthBloc>().add(LoginWithGoogleRequested(context: context)); 
-                      //       },
-                      //     ),                          
-                      //     const SizedBox(width: 24),
-                      //   ],
-                      // ),
+                      const SizedBox(height: 20),
+
+                      // ── Google Button ───────────────────────────────────
+                      BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, state) {
+                          final isLoading = state is AuthLoading;
+                          return ElevatedButton(
+                            onPressed: isLoading
+                                ? null
+                                : () {
+                                    FocusScope.of(context).unfocus();
+                                    context.read<AuthBloc>().add(
+                                          LoginWithGoogleRequested(
+                                              context: context),
+                                        );
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF212529),
+                              foregroundColor: const Color(0xFFF9B933),
+                              disabledForegroundColor:
+                                  const Color(0xFFF9B933).withOpacity(0.4),
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  color: isLoading
+                                      ? const Color(0xFFF9B933).withOpacity(0.3)
+                                      : const Color(0xFFF9B933),
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              textStyle: const TextStyle(
+                                fontFamily: 'Instrument Sans',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                              elevation: 0,
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                            child: Text(loc.login_with_google),
+                          );
+                        },
+                      ),
                       const SizedBox(height: 32),
-                      
-                      // Don't have an account
+
+                      // ── Sign Up Link ────────────────────────────────────
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            // "Don't have an account ? ",
                             loc.dontHaveAccount,
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.8),
@@ -252,11 +284,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontSize: 14,
                             ),
                           ),
+                          const SizedBox(width: 6),
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => const RegisterScreen(),
+                                  builder: (_) => const RegisterScreen(),
                                 ),
                               );
                             },
@@ -275,8 +308,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -305,26 +338,30 @@ class _LoginScreenState extends State<LoginScreen> {
       child: TextFormField(
         controller: _emailController,
         keyboardType: TextInputType.emailAddress,
+        textInputAction: TextInputAction.next,
         style: const TextStyle(
-          fontFamily: 'Instrument Sans', 
+          fontFamily: 'Instrument Sans',
           color: Colors.white,
           fontSize: 16,
         ),
         decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.email, color: Colors.white54),
+          prefixIcon: const Icon(Icons.email_outlined, color: Colors.white54),
           border: InputBorder.none,
           hintText: loc.enter_your_email,
           hintStyle: TextStyle(
-            color: Colors.white.withOpacity(0.6),
+            color: Colors.white.withOpacity(0.4),
             fontFamily: 'Instrument Sans',
             fontSize: 16,
           ),
         ),
+        autovalidateMode: _hasAttemptedLogin
+            ? AutovalidateMode.onUserInteraction
+            : AutovalidateMode.disabled,
         validator: (value) {
-          if (value == null || value.isEmpty) {
-            return loc.email;
+          if (value == null || value.trim().isEmpty) {
+            return loc.email; // replace with a proper message if available
           }
-          if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+').hasMatch(value)) {
+          if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+').hasMatch(value.trim())) {
             return loc.email;
           }
           return null;
@@ -342,90 +379,45 @@ class _LoginScreenState extends State<LoginScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: TextFormField(
         controller: _passwordController,
-        obscureText: true,
+        obscureText: _obscurePassword,
+        textInputAction: TextInputAction.done,
+        onFieldSubmitted: (_) => _loginWithEmail(),
         style: const TextStyle(
-          fontFamily: 'Instrument Sans', 
+          fontFamily: 'Instrument Sans',
           color: Colors.white,
           fontSize: 16,
         ),
         decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.lock, color: Colors.white54),
+          prefixIcon: const Icon(Icons.lock_outline, color: Colors.white54),
+          suffixIcon: IconButton(
+            icon: Icon(
+              _obscurePassword
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined,
+              color: Colors.white54,
+              size: 20,
+            ),
+            onPressed: () =>
+                setState(() => _obscurePassword = !_obscurePassword),
+          ),
           border: InputBorder.none,
-          hintText: '**********',
+          hintText: '••••••••••',
           hintStyle: TextStyle(
-            color: Colors.white.withOpacity(0.6),
+            color: Colors.white.withOpacity(0.4),
             fontFamily: 'Instrument Sans',
             fontSize: 16,
             letterSpacing: 2,
           ),
         ),
+        autovalidateMode: _hasAttemptedLogin
+            ? AutovalidateMode.onUserInteraction
+            : AutovalidateMode.disabled,
         validator: (value) {
           if (value == null || value.isEmpty) {
             return loc.password;
           }
           return null;
         },
-      ),
-    );
-  }
-}
-
-class _SocialIconButton extends StatefulWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  const _SocialIconButton({
-    required this.icon,
-    required this.onTap,
-  });
-
-  @override
-  State<_SocialIconButton> createState() => _SocialIconButtonState();
-}
-
-class _SocialIconButtonState extends State<_SocialIconButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnim;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 120),
-      vsync: this,
-      lowerBound: 0.0,
-      upperBound: 1.0,
-    );
-
-    _scaleAnim = Tween<double>(begin: 1.0, end: 1.05).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => _controller.forward(),
-      onTapUp: (_) => _controller.reverse(),
-      onTapCancel: () => _controller.reverse(),
-      onTap: widget.onTap,
-      child: ScaleTransition(
-        scale: _scaleAnim,
-        child: Container(
-          width: 50,
-          height: 56,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(widget.icon, color: Colors.white, size: 24),
-        ),
       ),
     );
   }

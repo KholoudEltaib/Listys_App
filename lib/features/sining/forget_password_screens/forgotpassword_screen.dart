@@ -86,6 +86,11 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white), 
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Form(

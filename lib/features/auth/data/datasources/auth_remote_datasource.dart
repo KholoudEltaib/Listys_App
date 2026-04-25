@@ -1,3 +1,4 @@
+import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../../../core/errors/exceptions.dart';
@@ -40,10 +41,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         data: {'email': email, 'password': password},
       );
 
+    
       if (loginResponse.statusCode == null ||
           loginResponse.statusCode! < 200 ||
           loginResponse.statusCode! >= 300) {
-        final message = _extractMessage(loginResponse.data) ?? 'Login failed';
+        final message = _extractMessage('typedsd: ${loginResponse.data}') ?? 'Login failed';
         throw ServerException(message, statusCode: loginResponse.statusCode);
       }
 
@@ -85,6 +87,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return AuthResultModel(token: token, user: userModel);
       
     } on DioException catch (e) {
+      print('❌ Dio error: ${e.message}');
       if (e.error is ServerException) rethrow;
       if (e.response != null) {
         final message = _extractMessage(e.response?.data) ?? 'Login failed';

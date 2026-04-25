@@ -18,15 +18,44 @@ class AuthRepositoryImpl implements AuthRepository {
     required this.localDataSource,
   });
 
+  // @override
+  // Future<Either<Failure, AuthResult>> loginWithEmail(String email, String password) async {
+  //   try {
+  //     final authResult = await remoteDataSource.loginWithEmail(email, password);
+  //     await localDataSource.saveToken(authResult.token);
+  //     await localDataSource.saveUserData(authResult.user as UserModel);
+  //     return Right(authResult);
+  //   } on ServerException catch (e) {
+  //     return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+  //   } on NetworkException catch (e) {
+  //     return Left(NetworkFailure(message: e.message));
+  //   } on CacheException catch (e) {
+  //     return Left(CacheFailure(message: e.message));
+  //   } catch (e) {
+  //     return Left(ServerFailure(message: 'Unexpected error: $e'));
+  //   }
+  // }
   @override
-  Future<Either<Failure, AuthResult>> loginWithEmail(String email, String password) async {
+  Future<Either<Failure, AuthResult>> loginWithEmail(
+    String email,
+    String password,
+  ) async {
     try {
       final authResult = await remoteDataSource.loginWithEmail(email, password);
+
+      final userModel = authResult.user is UserModel
+          ? authResult.user as UserModel
+          : UserModel.fromEntity(authResult.user);
+
       await localDataSource.saveToken(authResult.token);
-      await localDataSource.saveUserData(authResult.user as UserModel);
+      await localDataSource.saveUserData(userModel);
+
       return Right(authResult);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(
+        message: e.message,
+        statusCode: e.statusCode,
+      ));
     } on NetworkException catch (e) {
       return Left(NetworkFailure(message: e.message));
     } on CacheException catch (e) {
@@ -37,16 +66,18 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthResult>> register(String name, String email, String password) async {
+  Future<Either<Failure, AuthResult>> register(
+      String name, String email, String password) async {
     try {
       final authResult = await remoteDataSource.register(name, email, password);
       await localDataSource.saveToken(authResult.token);
       await localDataSource.saveUserData(authResult.user as UserModel);
       return Right(authResult);
     } on ServerException catch (e) {
-      if (e.message.contains('email') && 
-        (e.message.contains('already') || e.message.contains('exists'))) {
-        return const Left(ServerFailure(message:'This email is already used.'));
+      if (e.message.contains('email') &&
+          (e.message.contains('already') || e.message.contains('exists'))) {
+        return const Left(
+            ServerFailure(message: 'This email is already used.'));
       }
       return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
     } on NetworkException catch (e) {
@@ -59,10 +90,11 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthResult>> loginWithGoogle(BuildContext context) async {
+  Future<Either<Failure, AuthResult>> loginWithGoogle(
+      BuildContext context) async {
     try {
       // Don't pass context to remote data source - it's not needed
-      final authResult = await remoteDataSource.loginWithGoogle(); 
+      final authResult = await remoteDataSource.loginWithGoogle();
       await localDataSource.saveToken(authResult.token);
       await localDataSource.saveUserData(authResult.user as UserModel);
       return Right(authResult);
@@ -82,7 +114,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final token = await localDataSource.getToken();
       if (token == null) {
-        return const Left(AuthFailure(message: 'No authentication token found'));
+        return const Left(
+            AuthFailure(message: 'No authentication token found'));
       }
       final user = await remoteDataSource.getUserProfile(token);
       // Cache the updated user data
@@ -100,13 +133,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, User>> updateUserProfile({required String name, required String email}) async {
+  Future<Either<Failure, User>> updateUserProfile(
+      {required String name, required String email}) async {
     try {
       final token = await localDataSource.getToken();
       if (token == null) {
-        return const Left(AuthFailure(message: 'No authentication token found'));
+        return const Left(
+            AuthFailure(message: 'No authentication token found'));
       }
-      final user = await remoteDataSource.updateUserProfile(token, name: name, email: email);
+      final user = await remoteDataSource.updateUserProfile(token,
+          name: name, email: email);
       // Cache the updated user data
       await localDataSource.saveUserData(user);
       return Right(user);
@@ -130,7 +166,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final token = await localDataSource.getToken();
       if (token == null) {
-        return const Left(AuthFailure(message: 'No authentication token found'));
+        return const Left(
+            AuthFailure(message: 'No authentication token found'));
       }
       await remoteDataSource.changePassword(
         token,
@@ -155,7 +192,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final token = await localDataSource.getToken();
       if (token == null) {
-        return const Left(AuthFailure(message: 'No authentication token found'));
+        return const Left(
+            AuthFailure(message: 'No authentication token found'));
       }
       await remoteDataSource.deleteAccount(token);
       await localDataSource.clearCache();

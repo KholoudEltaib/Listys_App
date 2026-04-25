@@ -46,6 +46,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white), 
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),

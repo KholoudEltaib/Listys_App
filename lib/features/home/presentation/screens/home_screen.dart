@@ -8,7 +8,7 @@ import 'package:listys_app/features/home/presentation/cubit/home_state.dart';
 import 'package:listys_app/features/home/presentation/widgets/country_card.dart';
 import 'package:listys_app/features/home/presentation/widgets/header.dart';
 import 'package:listys_app/features/home/presentation/widgets/places_card.dart';
-import 'package:listys_app/features/home/presentation/widgets/places_filter.dart';
+// import 'package:listys_app/features/home/presentation/widgets/places_filter.dart';
 import 'package:listys_app/features/nearby_map/presentation/view/nearby_map_screen.dart';
 import 'package:listys_app/features/search/presentation/view/search_screen.dart';
 import 'package:listys_app/features/home/presentation/cubit/home_cubit.dart';
@@ -214,8 +214,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 16),
                     
-                    PlacesFilter(categories: home.categories),
-                    const SizedBox(height: 20),
+                    // PlacesFilter(categories: home.categories),
+                    // const SizedBox(height: 20),
                     
                     SizedBox(
                       height: 130,

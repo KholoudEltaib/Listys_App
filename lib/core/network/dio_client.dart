@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:listys_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import '../constants/api_endpoints.dart';
 import '../utils/storage_helper.dart';
@@ -89,7 +90,8 @@ class DioClient {
         final token = await StorageHelper.getToken();
         if (token != null && token.isNotEmpty) {
           options.headers['Authorization'] = 'Bearer $token';
-          print('   🔐 Token: ${token.substring(0, 20)}...');
+          // print('   🔐 Token: ${token.substring(0, 20)}...');
+          print('🔐 Token: ${token.length > 20 ? token.substring(0, 20) : token}');
         }
 
         // Get locale
@@ -123,6 +125,7 @@ class DioClient {
         print('   Status: ${error.response?.statusCode}');
         print('   Message: ${error.message}');
         print('================');
+        
         
         if (error.response?.statusCode == 401) {
           await StorageHelper.clearCache();
