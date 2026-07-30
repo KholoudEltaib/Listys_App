@@ -1,11 +1,12 @@
 // features/profile/presentation/view/profile_screen.dart
 
 import 'dart:ui';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart'; // ✅ تم إضافة مكتبة Shimmer
 import 'package:listys_app/core/di/service_locator.dart';
 import 'package:listys_app/core/helper/app_constants.dart';
-import 'dart:io';
 import 'package:listys_app/core/services/image_picker_service.dart';
 import 'package:listys_app/core/localization/app_localizations.dart';
 import 'package:listys_app/core/theme/app_color.dart';
@@ -21,7 +22,6 @@ class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});
 
   final ImagePickerService _imagePickerService = ImagePickerService();
-
 
   @override
   Widget build(BuildContext context) {
@@ -58,10 +58,9 @@ class ProfileScreen extends StatelessWidget {
               }
             },
             builder: (context, state) {
+              // ✅ استبدال مؤشر التحميل التقليدي بالـ Profile Skeleton Shimmer
               if (state is ProfileLoading && state is! AccountDeletionLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
-                );
+                return _buildProfileShimmer();
               } else if (state is ProfileLoaded ||
                   state is ProfileUpdateSuccess ||
                   state is AccountDeletionLoading) {
@@ -72,9 +71,7 @@ class ProfileScreen extends StatelessWidget {
                         : context.read<ProfileCubit>().cachedUser;
 
                 if (user == null) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: Colors.white),
-                  );
+                  return _buildProfileShimmer(); // استخدمنا Shimmer كـ Fallback برضه
                 }
 
                 return SingleChildScrollView(
@@ -97,52 +94,51 @@ class ProfileScreen extends StatelessWidget {
                               children: [
                                 Stack(
                                   children: [
-                                  GestureDetector(
-                                  onTap: () {
-                                    _imagePickerService.showImageSourceDialog(
-                                      context,
-                                      onCameraTap: () => _pickImageFromCamera(context),
-                                      onGalleryTap: () => _pickImageFromGallery(context),
-                                    );
-                                  },
-                                  child: Stack(
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 50,
-                                        backgroundColor: Colors.white24,
-                                        backgroundImage: user.hasImage
-                                            ? NetworkImage(user.fullImageUrl)
-                                            : null,
-                                        child: !user.hasImage
-                                            ? const Icon(
-                                                Icons.person,
-                                                size: 50,
-                                                color: Colors.white,
-                                              )
-                                            : null,
-                                      ),
-                                      Positioned(
-                                        bottom: 6,
-                                        right: 6,
-                                        child: Container(
-                                          height: 32,
-                                          width: 32,
-                                          decoration: const BoxDecoration(
-                                            color: AppColors.primaryColor,
-                                            shape: BoxShape.circle,
+                                    GestureDetector(
+                                      onTap: () {
+                                        _imagePickerService.showImageSourceDialog(
+                                          context,
+                                          onCameraTap: () => _pickImageFromCamera(context),
+                                          onGalleryTap: () => _pickImageFromGallery(context),
+                                        );
+                                      },
+                                      child: Stack(
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 50,
+                                            backgroundColor: Colors.white24,
+                                            backgroundImage: user.hasImage
+                                                ? NetworkImage(user.fullImageUrl)
+                                                : null,
+                                            child: !user.hasImage
+                                                ? const Icon(
+                                                    Icons.person,
+                                                    size: 50,
+                                                    color: Colors.white,
+                                                  )
+                                                : null,
                                           ),
-                                          child: const Icon(
-                                            Icons.edit,
-                                            size: 18,
-                                            color: Colors.black,
+                                          Positioned(
+                                            bottom: 6,
+                                            right: 6,
+                                            child: Container(
+                                              height: 32,
+                                              width: 32,
+                                              decoration: const BoxDecoration(
+                                                color: AppColors.primaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Icons.edit,
+                                                size: 18,
+                                                color: Colors.black,
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ),
-
-                                ],
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 12),
                                 Text(
@@ -322,6 +318,118 @@ class ProfileScreen extends StatelessWidget {
             },
           ),
         ),
+      ),
+    );
+  }
+
+  // ✅ تصميم واجهة Skeleton الخاصة بشاشة الإعدادات
+  Widget _buildProfileShimmer() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey[800]!,
+          highlightColor: Colors.grey[700]!,
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              
+              // 1. Shimmer Profile Header (Avatar + Name + Email)
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.black, // Requires color to render shimmer
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(width: 150, height: 20, color: Colors.white),
+                    const SizedBox(height: 8),
+                    Container(width: 200, height: 15, color: Colors.white),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              // 2. Shimmer Settings Card (3 Items)
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Column(
+                  children: List.generate(3, (index) => _buildShimmerProfileItem()),
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              // 3. Shimmer Logout & Delete Card
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Column(
+                  children: [
+                    _buildShimmerProfileItem(),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Container(
+                        width: double.infinity,
+                        height: 55,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ✅ بناء العنصر الواحد (ListTile) جوه الشاشة الوهمية
+  Widget _buildShimmerProfileItem() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Container(
+              height: 16,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(width: 40), 
+        ],
       ),
     );
   }
@@ -573,13 +681,12 @@ class ProfileScreen extends StatelessWidget {
         );
       },
     );
-    
   }
+  
   Future<void> _pickImageFromCamera(BuildContext context) async {
     final File? imageFile = await _imagePickerService.pickImageFromCamera();
     if (imageFile != null) {
      context.read<ProfileCubit>().updateProfileImage(imageFile.path);
-
     }
   }
 
@@ -587,7 +694,6 @@ class ProfileScreen extends StatelessWidget {
     final File? imageFile = await _imagePickerService.pickImageFromGallery();
     if (imageFile != null) {
      context.read<ProfileCubit>().updateProfileImage(imageFile.path);
-
     }
   }
 }

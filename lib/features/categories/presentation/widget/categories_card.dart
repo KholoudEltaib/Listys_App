@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart'; // ✅ تم إضافة مكتبة الـ Shimmer
 import 'package:listys_app/features/categories/presentation/cubit/categories_cubit.dart';
 import 'package:listys_app/features/categories/presentation/cubit/categories_satet.dart';
 import 'package:listys_app/features/destination/presentation/view/destination_screen.dart';
@@ -16,9 +17,13 @@ class CategoriesCard extends StatelessWidget {
     return BlocBuilder<CategoriesCubit, CategoriesState>(
       builder: (context, state) {
         if (state is CategoriesLoading) {
-          return const Center(
-            child: CircularProgressIndicator(
-              color: Colors.white,
+          // ✅ تم استبدال مؤشر التحميل بتصميم الـ Skeleton
+          return Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: List.generate(
+              6, // نعرض 6 كروت وهمية أثناء التحميل
+              (index) => const CategoryShimmerSkeleton(),
             ),
           );
         } else if (state is CategoriesLoaded) {
@@ -100,6 +105,66 @@ class CategoriesCard extends StatelessWidget {
   }
 }
 
+// ✅ كلاس الهيكل الوهمي (Skeleton) اللي بيحاكي شكل الكارت الحقيقي
+class CategoryShimmerSkeleton extends StatelessWidget {
+  const CategoryShimmerSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double horizontalPadding = 16 * 2;
+    double spacing = 12;
+    double itemWidth = (screenWidth - horizontalPadding - spacing) / 2;
+
+    return Container(
+      width: itemWidth,
+      padding: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: const Color(0x07FFFFFF),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0x09FFFFFF), width: 1),
+      ),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[800]!,
+        highlightColor: Colors.grey[700]!,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // مساحة الصورة الوهمية
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                height: 108,
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Colors.black, // الـ Shimmer بيحتاج لون مصمت عشان يظهر
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+            // مساحة النص الوهمي
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+              child: Container(
+                height: 18,
+                width: itemWidth * 0.7, // النص بياخد 70% من عرض الكارت
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// الكارت الحقيقي (لم يتغير)
 class CategoryItem extends StatelessWidget {
   final String imageUrl;
   final String title;

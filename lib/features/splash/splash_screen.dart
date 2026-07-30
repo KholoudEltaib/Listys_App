@@ -116,7 +116,7 @@ class _SplashScreenState extends State<SplashScreen>
                   fontWeight: FontWeight.w400,
                   fontSize: 18,
                   color: Colors.grey.shade700,
-                  letterSpacing: 0.5,
+                  // letterspacing: 0.5,
                 ),
                 textAlign: TextAlign.center,
               ),

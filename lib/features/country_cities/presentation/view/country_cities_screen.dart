@@ -17,25 +17,23 @@ class _CountryCitiesScreenState extends State<CountryCitiesScreen> {
     final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 10),
-                    TitleHeader(title: loc.cities_of_country),
-                    const SizedBox(height: 20),
-                    CitiesCard(countryId: widget.countryId),
-                  ],
-                ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          // ✅ شيلنا الـ SingleChildScrollView عشان نثبت الـ Header
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 10),
+              TitleHeader(title: loc.cities_of_country),
+              const SizedBox(height: 20),
+              // ✅ حطينا الكارد جوه Expanded عشان ياخد باقي المساحة ويعمل Scroll لوحده
+              Expanded(
+                child: CitiesCard(countryId: widget.countryId),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

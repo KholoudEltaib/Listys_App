@@ -15,12 +15,23 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final PageController _pageController = PageController();
   int _currentIndex = 0;
+  
+  bool _isBottomNavVisible = true;
+
+  void _onDrawerChanged(bool isOpen) {
+    setState(() {
+      _isBottomNavVisible = !isOpen;
+    });
+  }
 
   List<Widget> get _screens => [
-    const HomeScreen(),
-    const FavoritesRoot(),
-    ProfileScreen(),
-  ];
+        HomeScreen(
+          onDrawerChanged: _onDrawerChanged,
+          onNavigate: _onNavTap,
+        ),
+        const FavoritesRoot(),
+        ProfileScreen(),
+      ];
 
   void _onNavTap(int index) {
     setState(() => _currentIndex = index);
@@ -50,6 +61,7 @@ class _MainScreenState extends State<MainScreen> {
           // ---------- Bottom Navbar ----------
           ButtomNavbar(
             currentIndex: _currentIndex,
+            isVisible: _isBottomNavVisible, // ✅ تمرير حالة الظهور
             onTap: _onNavTap,
           ),
         ],
@@ -61,20 +73,27 @@ class _MainScreenState extends State<MainScreen> {
 class ButtomNavbar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
+  final bool isVisible; // ✅ استقبال حالة الظهور
 
   const ButtomNavbar({
     super.key,
     required this.currentIndex,
     required this.onTap,
+    this.isVisible = true, // القيمة الافتراضية
   });
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    return Positioned(
+    
+    // ✅ استخدام AnimatedPositioned بدل Positioned
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 300), // سرعة الأنيميشن
+      curve: Curves.easeInOut,
       left: 20,
       right: 20,
-      bottom: 40,
+      // ✅ لو isVisible بـ true هيفضل في مكانه 40، لو false هينزل تحت الشاشة -100
+      bottom: isVisible ? 40 : -100, 
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         height: 64,
@@ -92,25 +111,25 @@ class ButtomNavbar extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-          NavBarIcon(
-            icon: Icons.home_filled,
-            label: currentIndex == 0 ? loc.home : '',
-            isSelected: currentIndex == 0,
-            onTap: () => onTap(0),
-          ),
-          NavBarIcon(
-            icon: currentIndex == 1 ? Icons.favorite : Icons.favorite_border,
-            label: currentIndex == 1 ? loc.favorites : '',
-            isSelected: currentIndex == 1,
-            onTap: () => onTap(1),
-          ),
-          NavBarIcon(
-            icon: Icons.person,
-            label: currentIndex == 2 ? loc.profile : '',
-            isSelected: currentIndex == 2,
-            onTap: () => onTap(2),
-          ),
-        ],
+            NavBarIcon(
+              icon: Icons.home_filled,
+              label: currentIndex == 0 ? loc.home : '',
+              isSelected: currentIndex == 0,
+              onTap: () => onTap(0),
+            ),
+            NavBarIcon(
+              icon: currentIndex == 1 ? Icons.favorite : Icons.favorite_border,
+              label: currentIndex == 1 ? loc.favorites : '',
+              isSelected: currentIndex == 1,
+              onTap: () => onTap(1),
+            ),
+            NavBarIcon(
+              icon: Icons.person,
+              label: currentIndex == 2 ? loc.profile : '',
+              isSelected: currentIndex == 2,
+              onTap: () => onTap(2),
+            ),
+          ],
         ),
       ),
     );

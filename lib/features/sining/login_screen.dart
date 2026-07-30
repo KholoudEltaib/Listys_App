@@ -115,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     fontWeight: FontWeight.bold,
                     fontSize: 28,
                     color: Colors.white,
-                    letterSpacing: 1.5,
+                    // letterspacing: 1.5,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -406,7 +406,7 @@ class _LoginScreenState extends State<LoginScreen> {
             color: Colors.white.withOpacity(0.4),
             fontFamily: 'Instrument Sans',
             fontSize: 16,
-            letterSpacing: 2,
+            // letterspacing: 2,
           ),
         ),
         autovalidateMode: _hasAttemptedLogin

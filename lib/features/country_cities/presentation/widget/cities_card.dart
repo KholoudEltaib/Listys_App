@@ -1,5 +1,8 @@
+// features/country_cities/presentation/widget/cities_card.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart'; // ✅ إضافة مكتبة Shimmer
 import 'package:listys_app/features/categories/presentation/view/categories_screen.dart';
 import 'package:listys_app/features/country_cities/presentation/cubit/cities_cubit.dart';
 import 'package:listys_app/features/country_cities/domain/usecases/get_cities_usecase.dart';
@@ -22,7 +25,11 @@ class _CitiesCardState extends State<CitiesCard> {
       child: BlocBuilder<CitiesCubit, CitiesState>(
         builder: (context, state) {
           if (state is CitiesLoading) {
-            return const Center(child: CircularProgressIndicator());
+            // ✅ استخدام ListView.builder لعرض الهيكل الوهمي المخصص
+            return ListView.builder(
+              itemCount: 8,
+              itemBuilder: (context, index) => const CityShimmerSkeleton(),
+            );
           } else if (state is CitiesLoaded) {
             // #region agent log
             agentLog(
@@ -36,37 +43,41 @@ class _CitiesCardState extends State<CitiesCard> {
               runId: 'pre-fix',
             );
             // #endregion
-            return Column(
-              children: state.cities.map((city) {
+            
+            // ✅ تغيير Column لـ ListView.builder لأداء أفضل وسكرول سلس
+            return ListView.builder(
+              itemCount: state.cities.length,
+              itemBuilder: (context, index) {
+                final city = state.cities[index];
                 return CitiesItem(
                   imageUrl: city.image ?? '',
                   title: city.name,
                   onTap: () {
-                  // #region agent log
-                  agentLog(
-                    location: 'cities_card.dart:onTap',
-                    message: 'City tapped in CitiesCard',
-                    data: {
-                      'countryId': widget.countryId,
-                      'cityId': city.id,
-                      'cityName': city.name,
-                    },
-                    hypothesisId: 'H3',
-                    runId: 'pre-fix',
-                  );
-                  // #endregion
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => CategoriesScreen(
-                        cityId: city.id,
-                        cityName: city.name,
+                    // #region agent log
+                    agentLog(
+                      location: 'cities_card.dart:onTap',
+                      message: 'City tapped in CitiesCard',
+                      data: {
+                        'countryId': widget.countryId,
+                        'cityId': city.id,
+                        'cityName': city.name,
+                      },
+                      hypothesisId: 'H3',
+                      runId: 'pre-fix',
+                    );
+                    // #endregion
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CategoriesScreen(
+                          cityId: city.id,
+                          cityName: city.name,
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
                 );
-              }).toList(),
+              },
             );
           } else if (state is CitiesError) {
             // #region agent log
@@ -81,7 +92,23 @@ class _CitiesCardState extends State<CitiesCard> {
               runId: 'pre-fix',
             );
             // #endregion
-            return Center(child: Text(state.message));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                    const SizedBox(height: 16),
+                    Text(
+                      state.message, 
+                      style: const TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
           return const SizedBox();
         },
@@ -90,6 +117,61 @@ class _CitiesCardState extends State<CitiesCard> {
   }
 }
 
+// ✅ كلاس الهيكل الوهمي (Skeleton) اللي بيحاكي شكل CitiesItem
+class CityShimmerSkeleton extends StatelessWidget {
+  const CityShimmerSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: const Color(0x07FFFFFF),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0x09FFFFFF),
+          width: 1,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 9),
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey[800]!,
+          highlightColor: Colors.grey[700]!,
+          child: Row(
+            children: [
+              // محاكاة الصورة
+              Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              const SizedBox(width: 16),
+              // محاكاة النص
+              Expanded(
+                child: Container(
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 40), // مسافة عشان النص ميوصلش للآخر
+              // محاكاة السهم
+              const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.black),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// الكارت الحقيقي (CitiesItem كما هو بدون تغيير)
 class CitiesItem extends StatelessWidget {
   final String imageUrl;
   final String title;

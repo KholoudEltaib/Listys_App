@@ -73,7 +73,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   fontWeight: FontWeight.bold,
                   fontSize: 28,
                   color: Colors.white,
-                  letterSpacing: 1.5,
+                  // letterspacing: 1.5,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -295,7 +295,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             color: Colors.white.withOpacity(0.6),
             fontFamily: 'Instrument Sans',
             fontSize: 16,
-            letterSpacing: 2,
+            // letterspacing: 2,
           ),
         ),
         validator: (value) {
@@ -334,7 +334,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             color: Colors.white.withOpacity(0.6),
             fontFamily: 'Instrument Sans',
             fontSize: 16,
-            letterSpacing: 2,
+            // letterspacing: 2,
           ),
         ),
         validator: (value) {

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart'; // ✅ إضافة مكتبة Shimmer
 import 'package:listys_app/core/helper/app_constants.dart';
 import 'package:listys_app/core/di/service_locator.dart';
 import 'package:listys_app/features/destination_details/presentation/cubit/place_details_cubit.dart';
@@ -31,9 +32,8 @@ class _DestinationDetailsScreenState extends State<DestinationDetailsScreen> {
           child: BlocBuilder<PlaceDetailsCubit, PlaceDetailsState>(
             builder: (context, state) {
               if (state is PlaceDetailsLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
-                );
+                // ✅ استبدال مؤشر التحميل بتصميم الـ Skeleton المخصص للتفاصيل
+                return _buildDetailsShimmer();
               } else if (state is PlaceDetailsLoaded) {
                 final place = state.place;
 
@@ -124,6 +124,125 @@ class _DestinationDetailsScreenState extends State<DestinationDetailsScreen> {
               return const SizedBox();
             },
           ),
+        ),
+      ),
+    );
+  }
+
+  // ✅ تصميم الـ Skeleton اللي بيحاكي شاشة التفاصيل
+  Widget _buildDetailsShimmer() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[800]!,
+        highlightColor: Colors.grey[700]!,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Shimmer Header (يحاكي اسم المكان)
+            Row(
+              children: [
+                const SizedBox(width: 8),
+                Container(
+                  width: 200,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // Shimmer Image Slider
+            Container(
+              width: double.infinity,
+              height: 250, // نفس ارتفاع السلايدر الأصلي
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Shimmer Content Tabs (أزرار التبديل)
+            Row(
+              children: [
+                Container(
+                  width: 100,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  width: 100,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // Shimmer Text Content (يحاكي التفاصيل الوصفية)
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(width: double.infinity, height: 16, color: Colors.black),
+                  const SizedBox(height: 10),
+                  Container(width: double.infinity, height: 16, color: Colors.black),
+                  const SizedBox(height: 10),
+                  Container(width: double.infinity, height: 16, color: Colors.black),
+                  const SizedBox(height: 10),
+                  Container(width: 200, height: 16, color: Colors.black),
+                  const SizedBox(height: 24),
+                  
+                  // كارت صغير بيحاكي الـ Info Card أو الخريطة
+                  Container(
+                    width: double.infinity,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Shimmer Bottom Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 55,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Container(
+                    height: 55,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

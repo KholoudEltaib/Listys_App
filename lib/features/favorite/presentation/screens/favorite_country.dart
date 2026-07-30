@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:listys_app/core/localization/app_localizations.dart';
+import 'package:listys_app/core/theme/shimmer_loading.dart'; // ✅ تم إضافة الـ import
 import 'package:listys_app/features/favorite/presentation/cubit/favorite_cubit.dart';
 import 'package:listys_app/features/favorite/presentation/cubit/favorite_state.dart';
 import 'package:listys_app/features/favorite/presentation/widgets/button_filter.dart';
@@ -35,7 +36,7 @@ class FavoriteCountry extends StatelessWidget {
                       const Header(),
                       const SizedBox(height: 12),
                       Text(
-                        loc.favorite_countries,
+                        loc.favorite_countries ?? 'Favorite Countries',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -65,10 +66,10 @@ class FavoriteCountry extends StatelessWidget {
 
   Widget _buildContent(BuildContext context, FavoriteState state) {
     final loc = AppLocalizations.of(context)!;
+    
+    // ✅ تم استبدال مؤشر التحميل بالـ Shimmer
     if (state is FavoriteLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: Color(0xFFF9B933)),
-      );
+      return const ShimmerCardGrid(itemCount: 6);
     }
 
     if (state is FavoriteError) {
@@ -98,45 +99,30 @@ class FavoriteCountry extends StatelessWidget {
       if (state.countries.isEmpty) {
         return Center(
           child: Text(
-            loc.no_favorite_countries,
+            loc.no_favorite_countries ?? 'No favorite countries',
             style: const TextStyle(color: Colors.white, fontSize: 16),
           ),
         );
       }
-      ElevatedButton(
-        onPressed: () {
-          print('🔴 Button pressed');
-          print('🔴 Current state: ${context.read<FavoriteCubit>().state}');
-          context.read<FavoriteCubit>().toggleFavorite(
-            id: 1,
-            type: 'country',
-          );
-          print('🔴 Toggle called');
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.red,
-        ),
-        child: const Text('TEST TOGGLE'),
-      );
 
       return GridView.builder(
-    itemCount: state.countries.length,
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      childAspectRatio: 0.75,
-    ),
-    itemBuilder: (context, index) {
-      final country = state.countries[index];
-      return CountryCard(country: country);  
-    },
-  );
+        itemCount: state.countries.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.95,
+        ),
+        itemBuilder: (context, index) {
+          final country = state.countries[index];
+          return CountryCard(country: country);  
+        },
+      );
     }
 
     return Center(
       child: Text(
-        loc.no_favorite_countries,
+        loc.no_favorite_countries ?? 'No favorite countries',
         style: const TextStyle(color: Colors.white, fontSize: 16),
       ),
     );

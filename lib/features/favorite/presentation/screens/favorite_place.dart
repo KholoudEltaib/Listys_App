@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:listys_app/core/localization/app_localizations.dart';
+import 'package:listys_app/core/theme/shimmer_loading.dart'; // ✅ تم إضافة الـ import
 import 'package:listys_app/features/favorite/presentation/cubit/favorite_cubit.dart';
 import 'package:listys_app/features/favorite/presentation/cubit/favorite_state.dart';
 import 'package:listys_app/features/favorite/presentation/widgets/button_filter.dart';
@@ -35,7 +36,7 @@ class FavoritePlace extends StatelessWidget {
                       const Header(),
                       const SizedBox(height: 12),
                       Text(
-                        loc.favorite_places,
+                        loc.favorite_places ?? 'Favorite Places',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -65,10 +66,10 @@ class FavoritePlace extends StatelessWidget {
 
   Widget _buildContent(BuildContext context, FavoriteState state) {
     final loc = AppLocalizations.of(context)!;
+    
+    // ✅ تم استبدال مؤشر التحميل بالـ Shimmer الطولي
     if (state is FavoriteLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: Color(0xFFF9B933)),
-      );
+      return const ShimmerVerticalList(itemCount: 5, height: 110);
     }
 
     if (state is FavoriteError) {
@@ -98,25 +99,25 @@ class FavoritePlace extends StatelessWidget {
       if (state.places.isEmpty) {
         return Center(
           child: Text(
-            loc.no_favorite_places,
+            loc.no_favorite_places ?? 'No favorite places',
             style: const TextStyle(color: Colors.white, fontSize: 16),
           ),
         );
       }
 
-    return ListView.separated(
-      itemCount: state.places.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final place = state.places[index];
-        return PlaceCard(place: place);  
-      },
-    );
+      return ListView.separated(
+        itemCount: state.places.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          final place = state.places[index];
+          return PlaceCard(place: place);  
+        },
+      );
     }
 
     return Center(
       child: Text(
-        loc.no_favorite_places,
+        loc.no_favorite_places ?? 'No favorite places',
         style: const TextStyle(color: Colors.white, fontSize: 16),
       ),
     );

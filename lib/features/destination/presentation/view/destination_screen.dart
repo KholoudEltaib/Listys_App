@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:listys_app/core/helper/app_constants.dart';
 import 'package:listys_app/core/di/service_locator.dart';
+import 'package:listys_app/core/theme/shimmer_loading.dart'; // ✅ تم إضافة مكتبة الـ Shimmer الخاصة بنا
 import 'package:listys_app/features/destination/presentation/cubit/place_cubit.dart';
 import 'package:listys_app/features/destination/presentation/cubit/place_state.dart';
 import 'package:listys_app/features/destination/presentation/widget/palce_card.dart';
@@ -48,7 +49,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
+                // Header (يفضل ثابت لا يتأثر بالتحميل)
                 Row(
                   children: [
                     const SizedBox(width: 8),
@@ -64,11 +65,8 @@ class _DestinationScreenState extends State<DestinationScreen> {
                   child: BlocBuilder<PlacesCubit, PlacesState>(
                     builder: (context, state) {
                       if (state is PlacesLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                          ),
-                        );
+                        // ✅ استبدال مؤشر التحميل بالـ Shimmer الطولي
+                        return const ShimmerVerticalList(itemCount: 5, height: 120);
                       } else if (state is PlacesLoaded) {
                         if (state.places.isEmpty) {
                           return Center(

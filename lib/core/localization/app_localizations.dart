@@ -135,7 +135,7 @@ class AppLocalizations {
   String get language_options => translate('language_options');
   String get delete_account => translate('delete_account');
   String get search_places => translate('search_places');
-  String get suggetions => translate('suggetions');
+  String get suggestions => translate('suggestions');
   String get history => translate('history');
   String get clear_all => translate('clear_all');
   String get filter_by => translate('filter_by');
@@ -175,6 +175,7 @@ class AppLocalizations {
   String get yes_logout => translate('yes_logout');
   String get no_back => translate('no_back');
   String get see_all => translate('see_all');
+  String get no_countries_available => translate('no_countries_available');
   String get current_password => translate('current_password');
   String get enter_current_password => translate('enter_current_password');
   String get enter_new_password => translate('enter_new_password');
@@ -196,7 +197,7 @@ class AppLocalizations {
   String get empty_favorite_description => translate('empty_favorite_description');
   String get no_favorites_yet => translate('no_favorites_yet');
   String get delete_account_confirmation => translate('delete_account_confirmation');
-  String get all_popular_countries => translate('all_popular_countries');
+  String get all_countries => translate('all_countries');
   String get show_nearby_places => translate('show_nearby_places');
   String get please_allow_location_access_to_view_nearby_places => translate('please_allow_location_access_to_view_nearby_places');
   String get nearby_places => translate('nearby_places');
@@ -215,6 +216,35 @@ class AppLocalizations {
   String get city_view => translate("City View");
   String get all_places => translate("All Places");
   String get login_with_google => translate("login_with_google");
+
+
+  // Drawer Items
+  String get nearbyMap => translate('nearbyMap');
+  String get contactUs => translate('contactUs');
+  String get privacyPolicy => translate('privacyPolicy');
+  String get aboutListys => translate('aboutListys');
+
+  // Privacy Policy Screen
+  String get lastUpdated => translate('lastUpdated');
+  String get privacyIntroTitle => translate('privacyIntroTitle');
+  String get privacyIntroDesc => translate('privacyIntroDesc');
+  String get privacyInfoTitle => translate('privacyInfoTitle');
+  String get privacyInfoDesc => translate('privacyInfoDesc');
+  String get privacyLocationTitle => translate('privacyLocationTitle');
+  String get privacyLocationDesc => translate('privacyLocationDesc');
+  String get privacySharingTitle => translate('privacySharingTitle');
+  String get privacySharingDesc => translate('privacySharingDesc');
+  String get privacyContactTitle => translate('privacyContactTitle');
+  String get privacyContactDesc => translate('privacyContactDesc');
+
+  // Contact Us Screen
+  String get wereHereToHelp => translate('wereHereToHelp');
+  String get contactUsDesc => translate('contactUsDesc');
+
+  // About Listys Screen
+  String get discoverWorldAroundYou => translate('discoverWorldAroundYou');
+  String get aboutListysDesc => translate('aboutListysDesc');
+  String get version => translate('version');
 }
 
 class _AppLocalizationsDelegate

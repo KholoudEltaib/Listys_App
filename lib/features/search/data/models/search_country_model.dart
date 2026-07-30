@@ -6,6 +6,7 @@ class SearchCountryModel extends SearchCountry {
     required super.name,
     super.nameAr,
     super.citiesCount,
+    super.image,
   });
 
   factory SearchCountryModel.fromJson(Map<String, dynamic> json) {
@@ -14,6 +15,7 @@ class SearchCountryModel extends SearchCountry {
       name: json['name'] as String,
       nameAr: json['name_ar'] as String?,
       citiesCount: json['cities_count'] as int?,
+      image: json['image'],
     );
   }
 
@@ -23,6 +25,7 @@ class SearchCountryModel extends SearchCountry {
       'name': name,
       'name_ar': nameAr,
       'cities_count': citiesCount,
+      'image': image,
     };
   }
 }

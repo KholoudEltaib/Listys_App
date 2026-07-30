@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:listys_app/core/theme/app_color.dart';
+import 'package:shimmer/shimmer.dart';
 
 class CustomImageNetwork extends StatelessWidget {
   const CustomImageNetwork(
@@ -9,6 +8,7 @@ class CustomImageNetwork extends StatelessWidget {
   final String image;
   final double? width;
   final double? height;
+
   @override
   Widget build(BuildContext context) {
     return Image.network(
@@ -17,28 +17,32 @@ class CustomImageNetwork extends StatelessWidget {
       width: width,
       height: height,
       errorBuilder: (_, __, ___) => Center(
-          child: Container(
-        width: width,
-        height: height,
-        decoration:
-            BoxDecoration(shape: BoxShape.circle, color: Colors.grey[200]),
-        child: const Center(
-          child: Icon(
-            Icons.image,
-            color: Colors.red,
+        child: Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle, 
+            color: Colors.grey[800], // Darkened to fit your dark theme
+          ),
+          child: const Center(
+            child: Icon(
+              Icons.image,
+              color: Colors.grey,
+            ),
           ),
         ),
-      )),
+      ),
       loadingBuilder: (_, child, progress) => progress == null
           ? child
-          : Center(
-              child: SizedBox(
-                  height: 24.h,
-                  width: 24.h,
-                  child: const CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: AppColors.grey,
-                  ))),
+          : Shimmer.fromColors(
+              baseColor: Colors.grey[800]!,
+              highlightColor: Colors.grey[700]!,
+              child: Container(
+                width: width ?? double.infinity,
+                height: height ?? double.infinity,
+                color: Colors.black, // Requires a solid color to render shimmer
+              ),
+            ),
     );
   }
 }

@@ -23,7 +23,7 @@ class SearchSuggestionsWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-        loc.suggetions,
+        loc.suggestions,
           style: const TextStyle(
             color: Colors.white,
             fontSize: 20,

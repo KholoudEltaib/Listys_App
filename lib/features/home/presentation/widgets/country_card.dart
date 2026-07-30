@@ -1,4 +1,3 @@
-// lib/features/home/presentation/widgets/country_card.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -34,49 +33,52 @@ class CountryCard extends StatelessWidget {
           border: Border.all(color: const Color(0x09FFFFFF), width: 1),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.min, // يخلي الكولوم ياخد مساحة الداتا بس
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
-              Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                child: country.image.isNotEmpty
-              ? (country.image.endsWith('.svg')
-                  ? SvgPicture.network(
-                      country.image,
-                      height: 108,
-                      width: 230,
-                      fit: BoxFit.cover,
-                      placeholderBuilder: (context) => _placeholder(),
-                    )
-                  : Image.network(
-                      country.image,
-                      height: 108,
-                      width: 200 - 16,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => _placeholder(),
-                    ))
-              : _placeholder(),
-              ),
-            ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    child: country.image.isNotEmpty
+                        ? (country.image.endsWith('.svg')
+                            ? SvgPicture.network(
+                                country.image,
+                                height: 108,
+                                width: double.infinity, // يفضل استخدام double.infinity عشان يملأ العرض المتاح
+                                fit: BoxFit.cover,
+                                placeholderBuilder: (context) => _placeholder(),
+                              )
+                            : Image.network(
+                                country.image,
+                                height: 108,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  print('❌ Error loading image for ${country.name}: $error');
+                                  return _placeholder();
+                                },
+                              ))
+                        : _placeholder(),
+                  ),
+                ),
                 Positioned(
                   top: 12,
                   left: 12,
                   child: BlocBuilder<FavoriteCubit, dynamic>(
                     builder: (context, state) {
                       final isFavorite = context.read<FavoriteCubit>().isFavorite(country.id, 'country');
-                      
+
                       return GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: () {
                           print('❤️ Favorite tapped: ${country.name}');
                           context.read<FavoriteCubit>().toggleFavorite(
-                                id: country.id,
-                                type: 'country',
-                              );
+                            id: country.id,
+                            type: 'country',
+                          );
                         },
                         child: Container(
                           padding: const EdgeInsets.all(8),
@@ -96,33 +98,43 @@ class CountryCard extends StatelessWidget {
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    country.name,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.white,
+            
+            // جعل النصوص تتجاوب مع المساحة وتتمدد إذا لزم الأمر
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      country.name,
+                      maxLines: 2, // ✅ السماح بسطرين
+                      overflow: TextOverflow.ellipsis, // وضع نقاط إذا زاد عن سطرين
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white,
+                        height: 1.2, // ✅ تظبيط المسافة بين السطرين لشكل مريح للعين
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    country.shortDescription,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: true,
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 12,
-                      height: 1.25,
-                    ),
-                  ),
-                ],
+                    
+                    // ✅ التحقق من وجود وصف قبل حجز مساحة له في الـ UI
+                    if (country.shortDescription.trim().isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        country.shortDescription,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 12,
+                          height: 1.25,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ),
           ],
@@ -134,7 +146,7 @@ class CountryCard extends StatelessWidget {
   Widget _placeholder() {
     return Container(
       height: 108,
-      width: 200 - 16,  
+      width: double.infinity,
       color: Colors.grey[800],
       child: const Icon(Icons.image, color: Colors.grey),
     );
