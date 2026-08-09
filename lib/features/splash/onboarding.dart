@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:listys_app/core/localization/app_localizations.dart';
 import 'package:listys_app/core/utils/storage_helper.dart';
-import 'package:listys_app/core/routes/app_routes.dart';
 import 'package:listys_app/features/sining/login_screen.dart'; 
 
 class OnboardingScreen extends StatefulWidget {
@@ -15,28 +14,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-Future<void> _completeOnboarding() async {
-  try {
-    // Attempt to save the state
-    await StorageHelper.setOnboardingCompleted(true);
-  } catch (e) {
-    // Log the error if it fails, but don't stop the navigation!
-    debugPrint('Failed to save onboarding state: $e');
-  }
+  Future<void> _completeOnboarding() async {
+    try {
+      await StorageHelper.setOnboardingCompleted(true);
+    } catch (e) {
+      debugPrint('Failed to save onboarding state: $e');
+    }
 
-  if (!mounted) return;
-  
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const LoginScreen(),
-    ),
-  );
-}
+    if (!mounted) return;
+    
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const LoginScreen(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final isRTL = Directionality.of(context) == TextDirection.rtl;
     
     final List<OnboardingData> onboardingData = [
       OnboardingData(
@@ -61,20 +59,28 @@ Future<void> _completeOnboarding() async {
       body: SafeArea(
         child: Column(
           children: [
-            GestureDetector(
-              behavior: HitTestBehavior.opaque, 
-              onTap: () {
-                _completeOnboarding();
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Text(
-                  loc.skip,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
-                ),
+            // Skip Button using TextButton for guaranteed responsiveness
+            Align(
+              alignment: isRTL ? Alignment.centerLeft : Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                child: _currentPage != 0
+                    ? const SizedBox.shrink()
+                    : TextButton(
+                        onPressed: () {
+                          _completeOnboarding();
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                        ),
+                        child: Text(
+                          loc.skip,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
               ),
             ),
             // PageView content
@@ -183,7 +189,6 @@ Future<void> _completeOnboarding() async {
                             child: ElevatedButton(
                               onPressed: () {
                                 if (_currentPage == onboardingData.length - 1) {
-                                  // ✅ Complete onboarding and navigate to login
                                   _completeOnboarding();
                                 } else {
                                   _pageController.nextPage(
@@ -226,11 +231,11 @@ class OnboardingPage extends StatelessWidget {
   final int totalPages;
 
   const OnboardingPage({
-    Key? key,
+    super.key,
     required this.data,
     required this.currentPage,
     required this.totalPages,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +244,6 @@ class OnboardingPage extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 40),
-          // Decorative dots for first page only
           if (currentPage == 0) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -272,7 +276,6 @@ class OnboardingPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
           ],
-          // Image section - Single large image for all pages
           Expanded(
             flex: 3,
             child: Container(
@@ -288,7 +291,6 @@ class OnboardingPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 40),
-          // Text content
           Expanded(
             flex: 1,
             child: Column(
