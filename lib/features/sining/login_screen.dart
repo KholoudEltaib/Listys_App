@@ -206,71 +206,71 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 24),
 
                       // ── Divider ─────────────────────────────────────────
-                      Row(
-                        children: [
-                          const Expanded(
-                            child: Divider(color: Colors.white30, thickness: 1),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              loc.translate('orSignInWith'),
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
-                                fontFamily: 'Instrument Sans',
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                          const Expanded(
-                            child: Divider(color: Colors.white30, thickness: 1),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
+                      // Row(
+                      //   children: [
+                      //     const Expanded(
+                      //       child: Divider(color: Colors.white30, thickness: 1),
+                      //     ),
+                      //     Padding(
+                      //       padding:
+                      //           const EdgeInsets.symmetric(horizontal: 16),
+                      //       child: Text(
+                      //         loc.translate('orSignInWith'),
+                      //         style: TextStyle(
+                      //           color: Colors.white.withOpacity(0.7),
+                      //           fontFamily: 'Instrument Sans',
+                      //           fontSize: 14,
+                      //         ),
+                      //       ),
+                      //     ),
+                      //     const Expanded(
+                      //       child: Divider(color: Colors.white30, thickness: 1),
+                      //     ),
+                      //   ],
+                      // ),
+                      // const SizedBox(height: 20),
 
                       // ── Google Button ───────────────────────────────────
-                      BlocBuilder<AuthBloc, AuthState>(
-                        builder: (context, state) {
-                          final isLoading = state is AuthLoading;
-                          return ElevatedButton(
-                            onPressed: isLoading
-                                ? null
-                                : () {
-                                    FocusScope.of(context).unfocus();
-                                    context.read<AuthBloc>().add(
-                                          LoginWithGoogleRequested(
-                                              context: context),
-                                        );
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF212529),
-                              foregroundColor: const Color(0xFFF9B933),
-                              disabledForegroundColor:
-                                  const Color(0xFFF9B933).withOpacity(0.4),
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  color: isLoading
-                                      ? const Color(0xFFF9B933).withOpacity(0.3)
-                                      : const Color(0xFFF9B933),
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              textStyle: const TextStyle(
-                                fontFamily: 'Instrument Sans',
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                              elevation: 0,
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 16),
-                            ),
-                            child: Text(loc.login_with_google),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 32),
+                      // BlocBuilder<AuthBloc, AuthState>(
+                      //   builder: (context, state) {
+                      //     final isLoading = state is AuthLoading;
+                      //     return ElevatedButton(
+                      //       onPressed: isLoading
+                      //           ? null
+                      //           : () {
+                      //               FocusScope.of(context).unfocus();
+                      //               context.read<AuthBloc>().add(
+                      //                     LoginWithGoogleRequested(
+                      //                         context: context),
+                      //                   );
+                      //             },
+                      //       style: ElevatedButton.styleFrom(
+                      //         backgroundColor: const Color(0xFF212529),
+                      //         foregroundColor: const Color(0xFFF9B933),
+                      //         disabledForegroundColor:
+                      //             const Color(0xFFF9B933).withOpacity(0.4),
+                      //         shape: RoundedRectangleBorder(
+                      //           side: BorderSide(
+                      //             color: isLoading
+                      //                 ? const Color(0xFFF9B933).withOpacity(0.3)
+                      //                 : const Color(0xFFF9B933),
+                      //           ),
+                      //           borderRadius: BorderRadius.circular(12),
+                      //         ),
+                      //         textStyle: const TextStyle(
+                      //           fontFamily: 'Instrument Sans',
+                      //           fontWeight: FontWeight.w600,
+                      //           fontSize: 16,
+                      //         ),
+                      //         elevation: 0,
+                      //         padding:
+                      //             const EdgeInsets.symmetric(vertical: 16),
+                      //       ),
+                      //       child: Text(loc.login_with_google),
+                      //     );
+                      //   },
+                      // ),
+                      // const SizedBox(height: 32),
 
                       // ── Sign Up Link ────────────────────────────────────
                       Row(
